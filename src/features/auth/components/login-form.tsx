@@ -1,8 +1,5 @@
 "use client";
 
-import * as React from "react";
-import * as z from "zod";
-import { useForm } from "@tanstack/react-form";
 import {
   Button,
   Card,
@@ -21,29 +18,12 @@ import {
 } from "@/components/ui";
 import Link from "next/link";
 import { Icons } from "@/lib/icons";
-import { toast } from "sonner";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useLoginForm } from "../hooks/use-login-form";
 
-const loginSchema = z.object({
-  username: z.string().min(8, "Username must be at least 8 characters"),
-  password: z.string().min(1, "Password is required"),
-});
+export function LoginForm() {
+  const { form, isPending, showPassword, setShowPassword } = useLoginForm();
 
-export default function LoginForm() {
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const form = useForm({
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-    validators: {
-      onSubmit: loginSchema,
-    },
-    onSubmit: async ({ value }) => {
-      console.log("Submit:", value);
-    },
-  });
   return (
     <Card className="w-full max-w-sm shadow-md">
       <CardHeader>
@@ -62,71 +42,68 @@ export default function LoginForm() {
       >
         <CardContent>
           <FieldGroup className="flex flex-col gap-5">
+            {/* Username Field */}
             <form.Field name="username">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field className="max-w-sm">
-                    <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput
-                        id={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Enter your username"
-                      />
-                    </InputGroup>
-                    {field.state.meta.isTouched && (
+              {(field) => (
+                <Field className="max-w-sm">
+                  <FieldLabel htmlFor={field.name}>Username</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      disabled={isPending} // Disable while loading
+                      placeholder="Enter your username"
+                    />
+                  </InputGroup>
+                  {field.state.meta.isTouched &&
+                    field.state.meta.errors.length > 0 && (
                       <FieldError>
                         {field.state.meta.errors[0]?.message}
                       </FieldError>
                     )}
-                  </Field>
-                );
-              }}
+                </Field>
+              )}
             </form.Field>
 
+            {/* Password Field */}
             <form.Field name="password">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field className="max-w-sm" data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput
-                        id={field.name}
-                        type={showPassword ? "text" : "password"}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Enter password"
+              {(field) => (
+                <Field className="max-w-sm">
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id={field.name}
+                      type={showPassword ? "text" : "password"}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      disabled={isPending}
+                      placeholder="Enter password"
+                    />
+                    <InputGroupAddon
+                      align="inline-end"
+                      className="cursor-pointer"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <HugeiconsIcon
+                        icon={
+                          showPassword ? Icons.ViewIcon : Icons.ViewOffSlashIcon
+                        }
                       />
-                      <InputGroupAddon
-                        align="inline-end"
-                        className="cursor-pointer"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <HugeiconsIcon icon={Icons.ViewIcon} />
-                        ) : (
-                          <HugeiconsIcon icon={Icons.ViewOffSlashIcon} />
-                        )}
-                      </InputGroupAddon>
-                    </InputGroup>
-                    {field.state.meta.isTouched && (
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {field.state.meta.isTouched &&
+                    field.state.meta.errors.length > 0 && (
                       <FieldError>
                         {field.state.meta.errors[0]?.message}
                       </FieldError>
                     )}
-                  </Field>
-                );
-              }}
+                </Field>
+              )}
             </form.Field>
+
             <Link
               href="#"
               className="ml-auto mb-2 text-xs text-neutral-500 hover:underline"
@@ -137,12 +114,15 @@ export default function LoginForm() {
         </CardContent>
 
         <CardFooter className="flex-col gap-4">
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
-            {([canSubmit, isSubmitting]) => (
-              <Button type="submit" size="lg" className="w-full">
-                {isSubmitting ? "Logging in..." : "Login"}
+          <form.Subscribe selector={(state) => [state.canSubmit]}>
+            {([canSubmit]) => (
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full"
+                disabled={!canSubmit || isPending}
+              >
+                {isPending ? "Login..." : "Login"}
               </Button>
             )}
           </form.Subscribe>
