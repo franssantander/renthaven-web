@@ -1,4 +1,4 @@
-import { Hero } from "@/shared/components/sections/Hero";
+import { Hero } from "@/components/sections/Hero";
 import React from "react";
 
 export const HomePage = () => {
