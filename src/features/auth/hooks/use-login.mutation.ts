@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authApi } from "../api/auth-api";
-import { useAuthStore } from "../store/auth-store";
+import { authApi } from "../api";
+import { useAuthStore } from "../stores/auth-store";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -19,8 +19,10 @@ export const useLoginMutation = () => {
       toast.success("Welcome back!");
       router.push("/dashboard");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Login failed");
+    onError: (error: string) => {
+      toast.error(error.response?.data?.message || "Login failed", {
+        position: "top-center",
+      });
     },
   });
 };

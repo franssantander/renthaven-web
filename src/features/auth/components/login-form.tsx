@@ -15,9 +15,9 @@ import {
   InputGroupInput,
   FieldError,
   FieldGroup,
-} from "@/components/ui";
+} from "@/shared/components/ui";
 import Link from "next/link";
-import { Icons } from "@/lib/icons";
+import { Icons } from "@/shared/lib/icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useLoginForm } from "../hooks/use-login-form";
 

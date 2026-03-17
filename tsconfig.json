@@ -21,10 +21,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
+      "@components/*": ["src/shared/components/*"],
       "@featues/*": ["./src/featues/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@providers/*": ["./src/providers/*"],
+      "@lib/*": ["src/shared/lib/*"],
+      "@providers/*": ["src/shared/providers/*"],
       "@types/*": ["./src/types/*"]
     }
   },
