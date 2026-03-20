@@ -1,15 +1,15 @@
 export interface User {
   id: number;
   username: string;
-  email: string;
   name: string;
+  email: string;
   role: "superadmin" | "admin" | "tenant";
 }
 
 export interface AuthState {
-  token: string | null;
   user: User | null;
-  setAuth: (token: string, user: User) => void;
+  isAuth: boolean;
+  setAuth: (user: User) => void;
   clearAuth: () => void;
 }
 
@@ -18,7 +18,6 @@ export interface AuthResponse {
   message: string;
   status: number;
   data: {
-    access_token: string;
     user: User;
   };
 }

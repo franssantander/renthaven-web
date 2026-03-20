@@ -18,6 +18,7 @@
     "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "js-cookie": "^3.0.5",
     "next": "16.1.6",
     "next-themes": "^0.4.6",
     "postcss": "^8.5.6",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/eslint-plugin-query": "^5.91.4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

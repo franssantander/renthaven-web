@@ -8,7 +8,10 @@ export * from "./hooks/useLoginForm";
 export * from "./auth.queries";
 
 //* stores
-export * from "./stores/auth-store";
+export * from "./stores/authStore";
+
+//*
+export * from "./auth.api";
 
 //* types
 export * from "./auth.types";
