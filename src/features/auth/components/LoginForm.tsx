@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Button,
   Card,
@@ -19,7 +18,7 @@ import {
 import Link from "next/link";
 import { Icons } from "@/shared/lib/icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useLoginForm } from "../hooks/use-login-form";
+import { useLoginForm } from "../auth.index";
 
 export function LoginForm() {
   const { form, isPending, showPassword, setShowPassword } = useLoginForm();
@@ -53,7 +52,7 @@ export function LoginForm() {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      disabled={isPending} // Disable while loading
+                      disabled={isPending}
                       placeholder="Enter your username"
                     />
                   </InputGroup>
@@ -67,7 +66,6 @@ export function LoginForm() {
               )}
             </form.Field>
 
-            {/* Password Field */}
             <form.Field name="password">
               {(field) => (
                 <Field className="max-w-sm">

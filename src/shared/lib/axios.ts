@@ -20,15 +20,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// RESPONSE INTERCEPTOR: Handle expired tokens
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // The token expired or is invalid
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    const excludeStatus = [400, 422];
+
+    if (status === 401) {
       useAuthStore.getState().clearAuth();
 
-      // Redirect to login
       if (
         typeof window !== "undefined" &&
         window.location.pathname !== "/login"
@@ -36,6 +37,20 @@ api.interceptors.response.use(
         window.location.href = "/login";
       }
     }
+
+    if (status === 403)
+      return toast.error("You do not have permision to perform this action", {
+        position: "top-center",
+      });
+
+    if (status === 500)
+      return toast.error("A server error occured. Please try again later.", {
+        position: "top-center",
+      });
+
+    if (message && !excludeStatus.includes(status))
+      return toast.error(message, { position: "top-center" });
+
     return Promise.reject(error);
   },
 );
