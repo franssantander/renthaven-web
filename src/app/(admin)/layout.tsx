@@ -1,3 +1,4 @@
+import { AdminShell } from "@/shared/components/layout/AdminShell";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -5,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <section>{children}</section>;
+  return <AdminShell>{children}</AdminShell>;
 }

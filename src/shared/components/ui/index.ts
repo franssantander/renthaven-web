@@ -12,3 +12,6 @@ export * from "./select";
 export * from "./separator";
 export * from "./sonner";
 export * from "./textarea";
+export * from "./sheet";
+export * from "./tooltip";
+export * from "./avatar";
