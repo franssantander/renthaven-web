@@ -19,18 +19,8 @@ export const Navbar = ({
               <Link href="/browse">Browse Houses</Link>
               <Link href="/pricing">Pricing</Link>
               <Link href="/login">
-                <Button variant="outline">Login</Button>
+                <Button>Sign In</Button>
               </Link>
-              <Link href="/register">
-                <Button>Start Hosting</Button>
-              </Link>
-            </>
-          )}
-
-          {type === "tenant" && (
-            <>
-              <Link href="/tenant/dashboard">My Bookings</Link>
-              <div className="w-10 h-10 rounded-full bg-slate-200" />
             </>
           )}
         </div>

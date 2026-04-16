@@ -8,9 +8,9 @@ import { ROUTES } from "@/shared/constants/routes";
 import { useAuthStore, User, authApi } from "./auth.index";
 
 const ROLE_REDIRECT: Record<User["role"], string> = {
-  superadmin: ROUTES.SUPERADMIN_DASHBOARD,
-  admin: ROUTES.ADMIN_DASHBOARD,
-  tenant: ROUTES.TENANT_DASHBOARD,
+  superadmin: ROUTES.SUPERADMIN,
+  admin: ROUTES.ADMIN,
+  tenant: ROUTES.TENANT,
 };
 
 export const useLoginMutation = () => {

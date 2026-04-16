@@ -10,7 +10,7 @@ export * from "./auth.queries";
 //* stores
 export * from "./stores/authStore";
 
-//*
+//* api
 export * from "./auth.api";
 
 //* types

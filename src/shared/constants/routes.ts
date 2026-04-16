@@ -1,6 +1,6 @@
 export const ROUTES = {
-  SUPERADMIN_DASHBOARD: "/superadmin/dashboard",
-  ADMIN_DASHBOARD: "/admin/dashboard",
-  TENANT_DASHBOARD: "/tenant/dashboard",
+  SUPERADMIN: "/dashboard",
+  ADMIN: "/dashboard",
+  TENANT: "/tenant/dashboard",
   HOME: "/home",
 };
