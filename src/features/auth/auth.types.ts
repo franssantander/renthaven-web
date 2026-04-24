@@ -1,8 +1,8 @@
 export interface User {
-  id: number;
-  username: string;
-  name: string;
+  id?: number;
   email: string;
+  name: string;
+  username: string;
   role: "superadmin" | "admin" | "tenant";
 }
 
@@ -19,5 +19,6 @@ export interface AuthResponse {
   status: number;
   data: {
     user: User;
+    access_token: string;
   };
 }

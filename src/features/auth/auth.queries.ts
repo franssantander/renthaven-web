@@ -1,11 +1,12 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { ROUTES } from "@/shared/constants/routes";
 import { useAuthStore, User, authApi } from "./auth.index";
+import Cookies from "js-cookie";
 
 const ROLE_REDIRECT: Record<User["role"], string> = {
   superadmin: ROUTES.SUPERADMIN,
@@ -22,11 +23,22 @@ export const useLoginMutation = () => {
     mutationFn: authApi.login,
 
     onSuccess: (response) => {
-      setAuth(response.data);
-      queryClient.setQueryData(["auth", "me"], response.data);
+      const userData = response.data;
+      const { access_token } = userData;
+
+      Cookies.set("token", access_token, { expires: 7, sameSite: "strict" });
+
+      setAuth(userData, access_token);
+
+      queryClient.setQueryData(["auth", "me"], userData);
       toast.success("Welcome back!", { position: "top-center" });
-      const role = response.data.role as User["role"];
-      const redirection = ROLE_REDIRECT[role] ?? ROUTES.HOME;
+
+      const role = userData.user.role as User["role"];
+
+      const redirection =
+        ROLE_REDIRECT[role] ??
+        ROUTES[role.toLocaleLowerCase() as keyof typeof ROUTES] ??
+        ROUTES.HOME;
 
       router.push(redirection);
     },
@@ -58,13 +70,13 @@ export const useLogoutMutation = () => {
   });
 };
 
-export const useMe = () => {
-  const { isAuth } = useAuthStore();
+// export const useMe = () => {
+//   const { isAuth } = useAuthStore();
 
-  return useQuery({
-    queryKey: ["auth", "me"],
-    queryFn: authApi.me,
-    enabled: isAuth,
-    staleTime: 1000 * 60 * 5,
-  });
-};
+//   return useQuery({
+//     queryKey: ["auth", "me"],
+//     queryFn: authApi.me,
+//     enabled: isAuth,
+//     staleTime: 1000 * 60 * 5,
+//   });
+// };
