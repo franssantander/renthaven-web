@@ -1,7 +1,7 @@
 
 🪵BACKLOGS:
     📌 Landing home page:
-        ☐ [FE] implement SaaS structure layout, the pricing section, demo and CTA.
+        ✔ [FE] implement SaaS structure layout, the pricing section, demo and CTA. @done(26-07-19 22:08)
     📌 Authentication flow:
         ☐ [FE] login page
         ☐ [FE] register page (business and tenant side)
@@ -15,7 +15,7 @@
             📌 Property units:
                 ☐ [FE] integrate endpoints CRUD
                 ☐ [FE] implement form validation client side and server side
-                
+
     
 
 📝TODOS:

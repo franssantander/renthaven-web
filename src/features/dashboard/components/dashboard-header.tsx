@@ -3,7 +3,7 @@
 import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { CurrentUser } from "@/features/auth/schemas/user-schema";
+import type { CurrentUser } from "@/features/auth/types";
 import { useLogout } from "../hooks/use-logout";
 
 type DashboardHeaderProps = {

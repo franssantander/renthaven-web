@@ -1,7 +1,32 @@
+import type { InternalAxiosRequestConfig } from "axios";
 import { toast } from "sonner";
 
 import { axiosClient } from "./client";
 import { parseApiError } from "./errors";
+
+type RetryableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+
+type QueuedRequest = {
+  resolve: (value: unknown) => void;
+  reject: (reason: unknown) => void;
+  config: RetryableRequestConfig;
+};
+
+let isRedirectingToLogin = false;
+let isRefreshingToken = false;
+let refreshQueue: QueuedRequest[] = [];
+
+function redirectToLogin() {
+  if (
+    typeof window !== "undefined" &&
+    window.location.pathname !== "/login" &&
+    !isRedirectingToLogin
+  ) {
+    isRedirectingToLogin = true;
+    toast.error("Your session has expired. Please log in again.");
+    window.location.assign("/login");
+  }
+}
 
 axiosClient.interceptors.request.use(
   (config) => {
@@ -13,17 +38,50 @@ axiosClient.interceptors.request.use(
   },
 );
 
-let isRedirectingToLogin = false;
-
 axiosClient.interceptors.response.use(
   (response) => {
     return response;
   },
 
-  (error) => {
+  async (error) => {
     const apiError = parseApiError(error);
-    const requestUrl: string = error?.config?.url ?? "";
+    const originalRequest = error?.config as RetryableRequestConfig | undefined;
+    const requestUrl: string = originalRequest?.url ?? "";
     const isLoginRequest = requestUrl.includes("/auth/login");
+    const isRefreshRequest = requestUrl.includes("/auth/refresh");
+
+    const shouldAttemptRefresh =
+      apiError.status === 401 &&
+      !isLoginRequest &&
+      !isRefreshRequest &&
+      originalRequest &&
+      !originalRequest._retry;
+
+    if (shouldAttemptRefresh && originalRequest) {
+      if (isRefreshingToken) {
+        originalRequest._retry = true;
+        return new Promise((resolve, reject) => {
+          refreshQueue.push({ resolve, reject, config: originalRequest });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshingToken = true;
+
+      try {
+        await axiosClient.post("/auth/refresh");
+        isRefreshingToken = false;
+        refreshQueue.forEach(({ resolve, config }) => resolve(axiosClient(config)));
+        refreshQueue = [];
+        return axiosClient(originalRequest);
+      } catch {
+        isRefreshingToken = false;
+        refreshQueue.forEach(({ reject }) => reject(apiError));
+        refreshQueue = [];
+        redirectToLogin();
+        return Promise.reject(apiError);
+      }
+    }
 
     switch (apiError.status) {
       case 401:
@@ -32,17 +90,12 @@ axiosClient.interceptors.response.use(
           break;
         }
 
-        console.warn("Session expired or user is unauthenticated.");
-
-        if (
-          typeof window !== "undefined" &&
-          window.location.pathname !== "/login" &&
-          !isRedirectingToLogin
-        ) {
-          isRedirectingToLogin = true;
-          toast.error("Your session has expired. Please log in again.");
-          window.location.assign("/login");
+        if (isRefreshRequest) {
+          break;
         }
+
+        console.warn("Session expired or user is unauthenticated.");
+        redirectToLogin();
         break;
 
       case 403:

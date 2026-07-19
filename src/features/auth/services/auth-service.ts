@@ -1,5 +1,5 @@
 import { axiosClient } from "@/lib/axios";
-import type { CurrentUserResponse } from "../schemas/user-schema";
+import type { CurrentUserResponse } from "../types";
 
 export const authService = {
   login(data: { username: string; password: string }) {

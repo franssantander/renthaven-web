@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCurrentUserQuery } from "@/features/auth/queries/auth-query";
-import type { UserRole } from "@/features/auth/schemas/user-schema";
+import type { UserRole } from "@/features/auth/types";
 
 const ALLOWED_ROLES: ReadonlyArray<UserRole["slug"]> = [
   "super_admin",
