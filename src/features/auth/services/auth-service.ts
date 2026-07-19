@@ -1,4 +1,5 @@
 import { axiosClient } from "@/lib/axios";
+import type { CurrentUserResponse } from "../schemas/user-schema";
 
 export const authService = {
   login(data: { username: string; password: string }) {
@@ -8,6 +9,8 @@ export const authService = {
     return axiosClient.post("/auth/logout");
   },
   getCurrentUser() {
-    return axiosClient.get("/");
+    return axiosClient
+      .get<CurrentUserResponse>("/auth/me")
+      .then((res) => res.data);
   },
 };

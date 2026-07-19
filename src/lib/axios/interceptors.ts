@@ -1,3 +1,5 @@
+import { toast } from "sonner";
+
 import { axiosClient } from "./client";
 import { parseApiError } from "./errors";
 
@@ -11,6 +13,8 @@ axiosClient.interceptors.request.use(
   },
 );
 
+let isRedirectingToLogin = false;
+
 axiosClient.interceptors.response.use(
   (response) => {
     return response;
@@ -18,10 +22,27 @@ axiosClient.interceptors.response.use(
 
   (error) => {
     const apiError = parseApiError(error);
+    const requestUrl: string = error?.config?.url ?? "";
+    const isLoginRequest = requestUrl.includes("/auth/login");
 
     switch (apiError.status) {
       case 401:
-        console.warn("User is unauthenticated.");
+        if (isLoginRequest) {
+          console.warn("Login attempt failed.");
+          break;
+        }
+
+        console.warn("Session expired or user is unauthenticated.");
+
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname !== "/login" &&
+          !isRedirectingToLogin
+        ) {
+          isRedirectingToLogin = true;
+          toast.error("Your session has expired. Please log in again.");
+          window.location.assign("/login");
+        }
         break;
 
       case 403:

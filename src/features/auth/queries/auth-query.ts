@@ -22,3 +22,14 @@ export function useLoginMutation() {
     },
   });
 }
+
+export function useLogoutMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authService.logout,
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["current-user"] });
+    },
+  });
+}
