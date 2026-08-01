@@ -3,9 +3,10 @@
 import { useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRoleGate } from "@/features/auth/hooks/use-role-gate";
+import { STAFF_ROLES } from "@/features/auth/lib/role-routes";
 import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
 import { DashboardSidebar } from "@/features/dashboard/components/dashboard-sidebar";
-import { useDashboardGate } from "@/features/dashboard/hooks/use-dashboard-gate";
 
 function DashboardLoadingSkeleton() {
   return (
@@ -40,7 +41,7 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isReady, currentUser } = useDashboardGate();
+  const { isReady, currentUser } = useRoleGate(STAFF_ROLES);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   if (!isReady) {
@@ -50,12 +51,12 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen overflow-hidden">
       <DashboardSidebar
+        currentUser={currentUser}
         isMobileNavOpen={isMobileNavOpen}
         onMobileNavOpenChange={setIsMobileNavOpen}
       />
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
-          currentUser={currentUser}
           onMobileMenuClick={() => setIsMobileNavOpen(true)}
         />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>

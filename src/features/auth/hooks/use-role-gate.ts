@@ -3,22 +3,16 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { useCurrentUserQuery } from "@/features/auth/queries/auth-query";
-import type { UserRole } from "@/features/auth/types";
+import { useCurrentUserQuery } from "../queries/auth-query";
+import type { UserRole } from "../types";
+import { getRoleHomePath } from "../lib/role-routes";
 
-const ALLOWED_ROLES: ReadonlyArray<UserRole["slug"]> = [
-  "super_admin",
-  "admin",
-  "staff",
-];
-
-export function useDashboardGate() {
+export function useRoleGate(allowedRoles: readonly UserRole["slug"][]) {
   const router = useRouter();
   const { data, isLoading, isError } = useCurrentUserQuery();
-
   const currentUser = data?.data;
   const isAllowedRole =
-    !!currentUser && ALLOWED_ROLES.includes(currentUser.role.slug);
+    !!currentUser && allowedRoles.includes(currentUser.role.slug);
 
   useEffect(() => {
     if (isError) {
@@ -26,7 +20,7 @@ export function useDashboardGate() {
     }
 
     if (!isLoading && currentUser && !isAllowedRole) {
-      router.replace("/login");
+      router.replace(getRoleHomePath(currentUser.role.slug));
     }
   }, [isLoading, isError, currentUser, isAllowedRole, router]);
 

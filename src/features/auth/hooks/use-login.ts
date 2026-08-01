@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { ApiError } from "@/lib/axios";
+import { getRoleHomePath } from "../lib/role-routes";
 import { useLoginMutation } from "../queries/auth-query";
 import { loginSchema, type LoginFormValues } from "../schemas/login-schema";
+import { authService } from "../services/auth-service";
 
 type FieldErrors = Partial<Record<keyof LoginFormValues, string>>;
 
 export function useLogin() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const {
     mutate: loginFn,
@@ -54,9 +58,13 @@ export function useLogin() {
     setFieldErrors({});
 
     loginFn(result.data, {
-      onSuccess: () => {
+      onSuccess: async () => {
         toast.success("Logged in successfully.");
-        router.push("/dashboard");
+        const me = await queryClient.fetchQuery({
+          queryKey: ["current-user"],
+          queryFn: authService.getCurrentUser,
+        });
+        router.push(getRoleHomePath(me.data.role.slug));
       },
       onError: (err) => {
         const apiError = err as ApiError;
