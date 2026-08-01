@@ -5,7 +5,6 @@ import { Bell, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getPageTitle } from "../config/nav-items";
-import { Be } from "zod/v4/locales";
 
 type DashboardHeaderProps = {
   onMobileMenuClick: () => void;

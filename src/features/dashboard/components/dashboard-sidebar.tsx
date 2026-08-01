@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -163,12 +164,14 @@ function SidebarUserFooter({
           align={isCollapsed ? "center" : "start"}
           className="w-56"
         >
-          <DropdownMenuLabel>
-            <p className="text-sm font-medium">{currentUser.full_name}</p>
-            <p className="text-xs font-normal text-muted-foreground">
-              {currentUser.role.role_name}
-            </p>
-          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>
+              <p className="text-sm font-medium">{currentUser.full_name}</p>
+              <p className="text-xs font-normal text-muted-foreground">
+                {currentUser.role.role_name}
+              </p>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
