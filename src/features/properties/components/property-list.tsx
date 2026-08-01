@@ -27,25 +27,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils/utils";
+import { DataTable, type DataTableColumn } from "@/components/shared/data-table";
 import { getPropertyTypeLabel } from "../config/property-types";
 import { usePropertiesPage } from "../hooks/use-properties";
+import type { Property } from "../types";
 import { PropertyFormDialog } from "./property-form-dialog";
 
 export function PropertyList() {
@@ -58,6 +43,8 @@ export function PropertyList() {
     error,
     page,
     setPage,
+    handleSearchChange,
+    refetch,
     createOpen,
     setCreateOpen,
     editingProperty,
@@ -68,129 +55,98 @@ export function PropertyList() {
     isDeletePending,
   } = usePropertiesPage();
 
+  const columns: DataTableColumn<Property>[] = [
+    {
+      id: "name",
+      header: "Name",
+      cell: (property) => (
+        <span className="font-medium">{property.name}</span>
+      ),
+    },
+    {
+      id: "type",
+      header: "Type",
+      cell: (property) => (
+        <Badge variant="outline">{getPropertyTypeLabel(property.type)}</Badge>
+      ),
+    },
+    {
+      id: "address",
+      header: "Address",
+      cell: (property) => (
+        <span className="text-muted-foreground">
+          {property.address || "—"}
+        </span>
+      ),
+    },
+    {
+      id: "amenities",
+      header: "Amenities",
+      cell: (property) => (
+        <span className="text-muted-foreground">
+          {property.amenities?.length ?? 0}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: <span className="sr-only">Actions</span>,
+      headerClassName: "w-10",
+      cell: (property) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+            <MoreHorizontal className="size-4" />
+            <span className="sr-only">Open actions</span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setEditingProperty(property)}>
+              <Pencil className="size-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setDeletingProperty(property)}
+            >
+              <Trash2 className="size-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Properties</CardTitle>
-          <CardDescription>
-            Manage the properties in your portfolio.
-          </CardDescription>
-        </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="size-4" />
-          Add property
-        </Button>
+      <CardHeader>
+        <CardTitle>Properties</CardTitle>
+        <CardDescription>
+          Manage the properties in your portfolio.
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        {isError ? (
-          <p className="py-8 text-center text-sm text-destructive">
-            {error?.message ?? "Failed to load properties."}
-          </p>
-        ) : isLoading ? (
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-9 w-full" />
-            <Skeleton className="h-9 w-full" />
-            <Skeleton className="h-9 w-full" />
-          </div>
-        ) : properties.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No properties yet. Add your first property to get started.
-          </p>
-        ) : (
-          <Table className={cn(isFetching && "opacity-60 transition-opacity")}>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Amenities</TableHead>
-                <TableHead className="w-10">
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {properties.map((property) => (
-                <TableRow key={property.uuid}>
-                  <TableCell className="font-medium">
-                    {property.name}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {getPropertyTypeLabel(property.type)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {property.address || "—"}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {property.amenities?.length ?? 0}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={<Button variant="ghost" size="icon-sm" />}
-                      >
-                        <MoreHorizontal className="size-4" />
-                        <span className="sr-only">Open actions</span>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => setEditingProperty(property)}
-                        >
-                          <Pencil className="size-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => setDeletingProperty(property)}
-                        >
-                          <Trash2 className="size-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-
-        {meta && meta.last_page > 1 ? (
-          <Pagination className="mt-4 justify-end">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (page > 1) setPage(page - 1);
-                  }}
-                  className={cn(page <= 1 && "pointer-events-none opacity-50")}
-                />
-              </PaginationItem>
-              <PaginationItem>
-                <span className="px-2 text-sm text-muted-foreground">
-                  Page {meta.current_page} of {meta.last_page}
-                </span>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (page < meta.last_page) setPage(page + 1);
-                  }}
-                  className={cn(
-                    page >= meta.last_page && "pointer-events-none opacity-50",
-                  )}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        ) : null}
+        <DataTable
+          columns={columns}
+          data={properties}
+          getRowId={(property) => property.uuid}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          isError={isError}
+          errorMessage={error?.message}
+          emptyMessage="No properties yet. Add your first property to get started."
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search properties..."
+          onRefresh={refetch}
+          page={page}
+          onPageChange={setPage}
+          lastPage={meta?.last_page}
+          toolbarActions={
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="size-4" />
+              Add property
+            </Button>
+          }
+        />
       </CardContent>
 
       <PropertyFormDialog

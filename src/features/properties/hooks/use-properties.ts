@@ -12,12 +12,29 @@ import type { Property } from "../types";
 
 const PER_PAGE = 15;
 
+function matchesSearch(property: Property, search: string): boolean {
+  const term = search.trim().toLowerCase();
+  if (!term) return true;
+
+  return (
+    property.name.toLowerCase().includes(term) ||
+    (property.address ?? "").toLowerCase().includes(term)
+  );
+}
+
 export function usePropertiesPage() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isFetching, isError, error } = usePropertiesQuery({
-    page,
-    per_page: PER_PAGE,
-  });
+  const [search, setSearch] = useState("");
+  const { data, isLoading, isFetching, isError, error, refetch } =
+    usePropertiesQuery({
+      page,
+      per_page: PER_PAGE,
+    });
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(
@@ -44,7 +61,9 @@ export function usePropertiesPage() {
   };
 
   return {
-    properties: data?.data ?? [],
+    properties: (data?.data ?? []).filter((property) =>
+      matchesSearch(property, search),
+    ),
     meta: data?.meta,
     isLoading,
     isFetching,
@@ -52,6 +71,8 @@ export function usePropertiesPage() {
     error: error as ApiError | null,
     page,
     setPage,
+    handleSearchChange,
+    refetch,
     createOpen,
     setCreateOpen,
     editingProperty,
