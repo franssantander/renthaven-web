@@ -1,13 +1,10 @@
 
 🪵BACKLOGS:
-    📌 Landing home page:
-        ✔ [FE] implement SaaS structure layout, the pricing section, demo and CTA. @done(26-07-19 22:08)
+    
     📌 Authentication flow:
-        ☐ [FE] login page
         ☐ [FE] register page (business and tenant side)
 
-    📌 Dashboard (super_admin, admin, staff, tenant):
-        ☐ [FE] implement the dashboard shell for following roles
+    
 
     📌 Properties:
         ☐ [FE] integrate the endpoints for CRUD.
@@ -23,9 +20,15 @@
 
 
 ⚡IN-PROGRESS:
-
+    📌 User Management:
+        ☐ [FE] Integrate User Management 
 
 
 ✅DONE:
+    📌 Landing home page:
+        ✔ [FE] implement SaaS structure layout, the pricing section, demo and CTA. @done(26-07-19 22:08)
+    📌 Authentication flow:
+        ✔ [FE] login page @done(26-07-22 20:25)
 
-
+    📌 Dashboard (super_admin, admin, staff, tenant):
+        ✔ [FE] implement the dashboard shell for following roles @done(26-07-22 20:27)
