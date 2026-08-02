@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
+import { ImageOff } from "lucide-react";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +32,7 @@ import {
   getPropertyTypeLabel,
 } from "../config/property-types";
 import type { PropertyType } from "../types";
+import { usePropertyAmenitiesQuery } from "../queries/amenity-query";
 import { usePropertyForm } from "../hooks/use-property-form";
 import type { Property } from "../types";
 
@@ -42,16 +51,36 @@ export function PropertyFormDialog({
     values,
     handleChange,
     handleTypeChange,
+    handleImageChange,
+    handleAmenitiesChange,
     handleSubmit,
     isPending,
     isEditing,
     nameError,
     addressError,
     typeError,
+    profileImageError,
   } = usePropertyForm({
     property,
     onSuccess: () => onOpenChange(false),
   });
+
+  const { data: amenities, isLoading: isLoadingAmenities } =
+    usePropertyAmenitiesQuery();
+
+  const imagePreviewUrl = useMemo(
+    () =>
+      values.profile_image
+        ? URL.createObjectURL(values.profile_image)
+        : (property?.profile_image_url ?? null),
+    [values.profile_image, property?.profile_image_url],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    };
+  }, [imagePreviewUrl]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,6 +98,35 @@ export function PropertyFormDialog({
           </DialogHeader>
 
           <div className="flex flex-col gap-4 py-4">
+            <Field invalid={!!profileImageError}>
+              <FieldLabel htmlFor="property-profile-image">
+                Profile image
+              </FieldLabel>
+              <div className="flex items-center gap-3">
+                <Avatar size="lg" className="rounded-md">
+                  <AvatarImage
+                    src={imagePreviewUrl ?? undefined}
+                    className="rounded-md"
+                  />
+                  <AvatarFallback className="rounded-md">
+                    <ImageOff className="size-4" />
+                  </AvatarFallback>
+                </Avatar>
+                <Input
+                  id="property-profile-image"
+                  name="profile_image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  aria-invalid={!!profileImageError}
+                  className="flex-1"
+                />
+              </div>
+              {profileImageError ? (
+                <FieldError>{profileImageError}</FieldError>
+              ) : null}
+            </Field>
+
             <Field invalid={!!nameError}>
               <FieldLabel htmlFor="property-name">Name</FieldLabel>
               <Input
@@ -98,6 +156,44 @@ export function PropertyFormDialog({
                 </SelectContent>
               </Select>
               {typeError ? <FieldError>{typeError}</FieldError> : null}
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="property-amenities">Amenities</FieldLabel>
+              <Select
+                value={values.amenity_uuids}
+                onValueChange={handleAmenitiesChange}
+                multiple
+                disabled={isLoadingAmenities}
+              >
+                <SelectTrigger id="property-amenities" className="w-full">
+                  <SelectValue className="min-w-0 truncate">
+                    {(value: string[]) => {
+                      if (!value.length) {
+                        return isLoadingAmenities
+                          ? "Loading amenities..."
+                          : "Select amenities";
+                      }
+
+                      if (value.length === 1) {
+                        return (
+                          amenities?.find((a) => a.uuid === value[0])?.name ??
+                          value[0]
+                        );
+                      }
+
+                      return `${value.length} amenities selected`;
+                    }}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {amenities?.map((amenity) => (
+                    <SelectItem key={amenity.uuid} value={amenity.uuid}>
+                      {amenity.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
 
             <Field invalid={!!addressError}>

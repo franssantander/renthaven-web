@@ -57,3 +57,32 @@ export function useDeletePropertyMutation() {
     },
   });
 }
+
+export function useSyncPropertyAmenitiesMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      uuid,
+      amenityUuids,
+    }: {
+      uuid: string;
+      amenityUuids: string[];
+    }) => propertyService.syncAmenities(uuid, amenityUuids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+    },
+  });
+}
+
+export function useDeletePropertyAttachmentMutation() {
+  return useMutation({
+    mutationFn: ({
+      uuid,
+      attachmentUuid,
+    }: {
+      uuid: string;
+      attachmentUuid: string;
+    }) => propertyService.removeAttachment(uuid, attachmentUuid),
+  });
+}

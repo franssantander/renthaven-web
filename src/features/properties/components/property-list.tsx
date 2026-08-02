@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { ImageOff, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 
 import {
   AlertDialog,
@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,6 +58,23 @@ export function PropertyList() {
 
   const columns: DataTableColumn<Property>[] = [
     {
+      id: "profile_image",
+      header: <span className="sr-only">Image</span>,
+      headerClassName: "w-14",
+      cell: (property) => (
+        <Avatar className="rounded-md">
+          <AvatarImage
+            src={property.profile_image_url ?? undefined}
+            alt={property.name}
+            className="rounded-md"
+          />
+          <AvatarFallback className="rounded-md">
+            <ImageOff className="size-4" />
+          </AvatarFallback>
+        </Avatar>
+      ),
+    },
+    {
       id: "name",
       header: "Name",
       cell: (property) => (
@@ -82,11 +100,18 @@ export function PropertyList() {
     {
       id: "amenities",
       header: "Amenities",
-      cell: (property) => (
-        <span className="text-muted-foreground">
-          {property.amenities?.length ?? 0}
-        </span>
-      ),
+      cell: (property) =>
+        property.amenities?.length ? (
+          <div className="flex flex-wrap gap-1">
+            {property.amenities.map((amenity) => (
+              <Badge key={amenity.uuid} variant="secondary">
+                {amenity.name}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       id: "actions",

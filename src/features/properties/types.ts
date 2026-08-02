@@ -1,11 +1,14 @@
 export type PropertyType = "dorm" | "apartment" | "condo" | "town_house";
 
+export type AmenityScope = "property" | "unit" | "both";
+
 export type Amenity = {
   id: number;
   uuid: string;
   name: string;
   slug: string;
   category: string | null;
+  scope: AmenityScope;
   icon: string | null;
 };
 
@@ -39,6 +42,7 @@ export type Property = {
   tenant_business: PropertyTenantBusiness | null;
   amenities: Amenity[] | null;
   attachments: PropertyAttachment[] | null;
+  profile_image_url: string | null;
 };
 
 export type PaginatedProperties = {
