@@ -1,7 +1,5 @@
 import { axiosClient } from "@/lib/axios";
-import type { Amenity } from "../types";
-
-type ApiSuccess<T> = { data: T; status: number; message: string };
+import type { ApiSuccess, Amenity } from "../types";
 
 export const amenityService = {
   list() {

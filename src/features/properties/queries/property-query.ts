@@ -6,10 +6,8 @@ import {
 } from "@tanstack/react-query";
 
 import type { PropertyFormValues } from "../schemas/property-schema";
-import {
-  propertyService,
-  type PropertyListParams,
-} from "../services/property-service";
+import { propertyService } from "../services/property-service";
+import type { PropertyListParams } from "../types";
 
 export function usePropertiesQuery(params: PropertyListParams) {
   return useQuery({

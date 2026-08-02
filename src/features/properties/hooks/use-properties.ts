@@ -10,7 +10,7 @@ import {
 } from "../queries/property-query";
 import type { Property } from "../types";
 
-const PER_PAGE = 15;
+const DEFAULT_PER_PAGE = 15;
 
 function matchesSearch(property: Property, search: string): boolean {
   const term = search.trim().toLowerCase();
@@ -24,15 +24,21 @@ function matchesSearch(property: Property, search: string): boolean {
 
 export function usePropertiesPage() {
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(DEFAULT_PER_PAGE);
   const [search, setSearch] = useState("");
   const { data, isLoading, isFetching, isError, error, refetch } =
     usePropertiesQuery({
       page,
-      per_page: PER_PAGE,
+      per_page: perPage,
     });
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
+    setPage(1);
+  };
+
+  const handlePerPageChange = (value: number) => {
+    setPerPage(value);
     setPage(1);
   };
 
@@ -71,6 +77,8 @@ export function usePropertiesPage() {
     error: error as ApiError | null,
     page,
     setPage,
+    perPage,
+    handlePerPageChange,
     handleSearchChange,
     refetch,
     createOpen,

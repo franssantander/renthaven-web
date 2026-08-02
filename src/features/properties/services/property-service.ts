@@ -1,13 +1,11 @@
 import { axiosClient } from "@/lib/axios";
 import type { PropertyFormValues } from "../schemas/property-schema";
-import type { PaginatedProperties, Property } from "../types";
-
-export type PropertyListParams = {
-  page?: number;
-  per_page?: number;
-};
-
-type ApiSuccess<T> = { data: T; status: number; message: string };
+import type {
+  ApiSuccess,
+  PaginatedProperties,
+  Property,
+  PropertyListParams,
+} from "../types";
 
 export const propertyService = {
   list(params: PropertyListParams = {}) {

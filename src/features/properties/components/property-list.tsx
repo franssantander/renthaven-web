@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageOff, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import {
   AlertDialog,
@@ -12,8 +12,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,16 +20,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DataTable, type DataTableColumn } from "@/components/shared/data-table";
-import { getPropertyTypeLabel } from "../config/property-types";
+import { DataTable } from "@/components/shared/data-table";
+import { getPropertyColumns } from "../config/property-columns";
 import { usePropertiesPage } from "../hooks/use-properties";
-import type { Property } from "../types";
 import { PropertyFormDialog } from "./property-form-dialog";
 
 export function PropertyList() {
@@ -44,6 +35,8 @@ export function PropertyList() {
     error,
     page,
     setPage,
+    perPage,
+    handlePerPageChange,
     handleSearchChange,
     refetch,
     createOpen,
@@ -56,90 +49,10 @@ export function PropertyList() {
     isDeletePending,
   } = usePropertiesPage();
 
-  const columns: DataTableColumn<Property>[] = [
-    {
-      id: "profile_image",
-      header: <span className="sr-only">Image</span>,
-      headerClassName: "w-14",
-      cell: (property) => (
-        <Avatar className="rounded-md">
-          <AvatarImage
-            src={property.profile_image_url ?? undefined}
-            alt={property.name}
-            className="rounded-md"
-          />
-          <AvatarFallback className="rounded-md">
-            <ImageOff className="size-4" />
-          </AvatarFallback>
-        </Avatar>
-      ),
-    },
-    {
-      id: "name",
-      header: "Name",
-      cell: (property) => (
-        <span className="font-medium">{property.name}</span>
-      ),
-    },
-    {
-      id: "type",
-      header: "Type",
-      cell: (property) => (
-        <Badge variant="outline">{getPropertyTypeLabel(property.type)}</Badge>
-      ),
-    },
-    {
-      id: "address",
-      header: "Address",
-      cell: (property) => (
-        <span className="text-muted-foreground">
-          {property.address || "—"}
-        </span>
-      ),
-    },
-    {
-      id: "amenities",
-      header: "Amenities",
-      cell: (property) =>
-        property.amenities?.length ? (
-          <div className="flex flex-wrap gap-1">
-            {property.amenities.map((amenity) => (
-              <Badge key={amenity.uuid} variant="secondary">
-                {amenity.name}
-              </Badge>
-            ))}
-          </div>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
-    },
-    {
-      id: "actions",
-      header: <span className="sr-only">Actions</span>,
-      headerClassName: "w-10",
-      cell: (property) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
-            <MoreHorizontal className="size-4" />
-            <span className="sr-only">Open actions</span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setEditingProperty(property)}>
-              <Pencil className="size-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => setDeletingProperty(property)}
-            >
-              <Trash2 className="size-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
-  ];
+  const columns = getPropertyColumns({
+    onEdit: setEditingProperty,
+    onDelete: setDeletingProperty,
+  });
 
   return (
     <Card>
@@ -165,6 +78,8 @@ export function PropertyList() {
           page={page}
           onPageChange={setPage}
           lastPage={meta?.last_page}
+          perPage={perPage}
+          onPerPageChange={handlePerPageChange}
           toolbarActions={
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="size-4" />

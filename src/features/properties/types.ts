@@ -63,3 +63,19 @@ export type PaginatedProperties = {
     total: number;
   };
 };
+
+export type ApiSuccess<T> = {
+  data: T;
+  status: number;
+  message: string;
+};
+
+export type PropertyListParams = {
+  page?: number;
+  per_page?: number;
+};
+
+export type PropertyColumnActions = {
+  onEdit: (property: Property) => void;
+  onDelete: (property: Property) => void;
+};

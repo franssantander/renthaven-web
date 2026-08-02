@@ -9,11 +9,20 @@ import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
+  PaginationFirst,
   PaginationItem,
+  PaginationLast,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -49,8 +58,14 @@ export type DataTableProps<T> = {
   page?: number;
   onPageChange?: (page: number) => void;
   lastPage?: number;
+  perPage?: number;
+  onPerPageChange?: (perPage: number) => void;
+  perPageOptions?: number[];
   toolbarActions?: React.ReactNode;
+  maxHeight?: string;
 };
+
+const DEFAULT_PER_PAGE_OPTIONS = [10, 15, 25, 50];
 
 function getPaginationRange(
   current: number,
@@ -83,7 +98,11 @@ export function DataTable<T>({
   page = 1,
   onPageChange,
   lastPage,
+  perPage,
+  onPerPageChange,
+  perPageOptions = DEFAULT_PER_PAGE_OPTIONS,
   toolbarActions,
+  maxHeight = "60vh",
 }: DataTableProps<T>) {
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebouncedValue(searchInput, 300);
@@ -137,77 +156,134 @@ export function DataTable<T>({
           {emptyMessage}
         </p>
       ) : (
-        <Table className={cn(isFetching && "opacity-60 transition-opacity")}>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead key={column.id} className={column.headerClassName}>
-                  {column.header}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow key={getRowId(row)}>
+        <div className="overflow-y-auto rounded-md border" style={{ maxHeight }}>
+          <Table className={cn(isFetching && "opacity-60 transition-opacity")}>
+            <TableHeader className="sticky top-0 z-10 bg-card">
+              <TableRow>
                 {columns.map((column) => (
-                  <TableCell key={column.id} className={column.cellClassName}>
-                    {column.cell(row)}
-                  </TableCell>
+                  <TableHead key={column.id} className={column.headerClassName}>
+                    {column.header}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data.map((row) => (
+                <TableRow key={getRowId(row)}>
+                  {columns.map((column) => (
+                    <TableCell key={column.id} className={column.cellClassName}>
+                      {column.cell(row)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
 
-      {lastPage && lastPage > 1 && onPageChange ? (
-        <Pagination className="justify-end">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (page > 1) onPageChange(page - 1);
+      {onPerPageChange || (lastPage && lastPage > 1 && onPageChange) ? (
+        <div className="flex items-center justify-between gap-4">
+          {onPerPageChange ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="hidden sm:inline">Rows per page</span>
+              <Select
+                value={String(perPage ?? perPageOptions[0])}
+                onValueChange={(value) => {
+                  if (value) onPerPageChange(Number(value));
                 }}
-                className={cn(page <= 1 && "pointer-events-none opacity-50")}
-              />
-            </PaginationItem>
-            {getPaginationRange(page, lastPage).map((entry, index) =>
-              entry === "ellipsis" ? (
-                <PaginationItem key={`ellipsis-${index}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={entry}>
-                  <PaginationLink
+              >
+                <SelectTrigger size="sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {perPageOptions.map((option) => (
+                    <SelectItem key={option} value={String(option)}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {lastPage && lastPage > 1 && onPageChange ? (
+            <Pagination className="mx-0 w-fit justify-end">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationFirst
                     href="#"
-                    isActive={entry === page}
                     onClick={(event) => {
                       event.preventDefault();
-                      if (entry !== page) onPageChange(entry);
+                      if (page > 1) onPageChange(1);
                     }}
-                  >
-                    {entry}
-                  </PaginationLink>
+                    className={cn(
+                      page <= 1 && "pointer-events-none opacity-50",
+                    )}
+                  />
                 </PaginationItem>
-              ),
-            )}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (page < lastPage) onPageChange(page + 1);
-                }}
-                className={cn(
-                  page >= lastPage && "pointer-events-none opacity-50",
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      if (page > 1) onPageChange(page - 1);
+                    }}
+                    className={cn(
+                      page <= 1 && "pointer-events-none opacity-50",
+                    )}
+                  />
+                </PaginationItem>
+                {getPaginationRange(page, lastPage).map((entry, index) =>
+                  entry === "ellipsis" ? (
+                    <PaginationItem key={`ellipsis-${index}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={entry}>
+                      <PaginationLink
+                        href="#"
+                        isActive={entry === page}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          if (entry !== page) onPageChange(entry);
+                        }}
+                      >
+                        {entry}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ),
                 )}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      if (page < lastPage) onPageChange(page + 1);
+                    }}
+                    className={cn(
+                      page >= lastPage && "pointer-events-none opacity-50",
+                    )}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLast
+                    href="#"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      if (page < lastPage) onPageChange(lastPage);
+                    }}
+                    className={cn(
+                      page >= lastPage && "pointer-events-none opacity-50",
+                    )}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
