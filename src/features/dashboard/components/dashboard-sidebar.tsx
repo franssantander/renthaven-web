@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, LogOut, PanelLeft, PanelLeftClose } from "lucide-react";
+import { LogOut, PanelLeft, PanelLeftClose } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -52,11 +53,13 @@ function SidebarBrand({
         isCollapsed ? "justify-center gap-1" : "justify-between gap-2 px-4",
       )}
     >
-      {!isCollapsed && (
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-          <House className="size-4" />
-        </span>
-      )}
+      <Image
+        src="/images/renthaven-logo-svg.svg"
+        alt="RentHaven"
+        width={28}
+        height={28}
+        className={cn("size-7 shrink-0", isCollapsed && "md:hidden")}
+      />
       {!isCollapsed ? (
         <span className="mr-auto truncate font-semibold">RentHaven</span>
       ) : null}

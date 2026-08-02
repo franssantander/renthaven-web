@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { House, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -25,9 +26,12 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <House className="size-4" />
-          </span>
+          <Image
+            src="/images/renthaven-logo-svg.svg"
+            alt="RentHaven"
+            width={28}
+            height={28}
+          />
           RentHaven
         </Link>
 
@@ -44,7 +48,10 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          <Link
+            href="/login"
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
+          >
             Log in
           </Link>
           <Link href="/register" className={buttonVariants({ size: "sm" })}>
@@ -53,7 +60,11 @@ export function SiteHeader() {
         </div>
 
         <Sheet>
-          <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" />}>
+          <SheetTrigger
+            render={
+              <Button variant="ghost" size="icon" className="md:hidden" />
+            }
+          >
             <Menu className="size-5" />
             <span className="sr-only">Toggle menu</span>
           </SheetTrigger>
@@ -82,7 +93,10 @@ export function SiteHeader() {
                 render={
                   <Link
                     href="/login"
-                    className={buttonVariants({ variant: "outline", className: "w-full" })}
+                    className={buttonVariants({
+                      variant: "outline",
+                      className: "w-full",
+                    })}
                   />
                 }
               >
@@ -90,7 +104,10 @@ export function SiteHeader() {
               </SheetClose>
               <SheetClose
                 render={
-                  <Link href="/register" className={buttonVariants({ className: "w-full" })} />
+                  <Link
+                    href="/register"
+                    className={buttonVariants({ className: "w-full" })}
+                  />
                 }
               >
                 Get started

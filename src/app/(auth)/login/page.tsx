@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
 
 import {
   Card,
@@ -18,6 +20,14 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
+          <Link className="mx-auto mb-2 size-12" href="/">
+            <Image
+              src="/images/renthaven-logo-svg.svg"
+              alt="RentHaven"
+              width={48}
+              height={48}
+            />
+          </Link>
           <CardTitle>Log in</CardTitle>
           <CardDescription>
             Enter your credentials to access your account.
