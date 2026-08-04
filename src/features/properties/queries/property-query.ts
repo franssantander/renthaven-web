@@ -17,6 +17,14 @@ export function usePropertiesQuery(params: PropertyListParams) {
   });
 }
 
+export function usePropertyQuery(uuid: string) {
+  return useQuery({
+    queryKey: ["properties", uuid],
+    queryFn: () => propertyService.get(uuid),
+    enabled: !!uuid,
+  });
+}
+
 export function useCreatePropertyMutation() {
   const queryClient = useQueryClient();
 

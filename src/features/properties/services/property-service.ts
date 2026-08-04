@@ -13,6 +13,11 @@ export const propertyService = {
       .get<PaginatedProperties>("/property", { params })
       .then((res) => res.data);
   },
+  get(uuid: string) {
+    return axiosClient
+      .get<ApiSuccess<Property>>(`/property/${uuid}`)
+      .then((res) => res.data.data);
+  },
   create(data: PropertyFormValues) {
     const formData = new FormData();
     formData.append("name", data.name);

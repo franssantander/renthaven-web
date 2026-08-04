@@ -55,11 +55,17 @@ function PropertyActionsCell({
 }: PropertyActionsCellProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+      <DropdownMenuTrigger
+        render={<Button variant="ghost" size="icon-sm" />}
+        onClick={(event: React.MouseEvent) => event.stopPropagation()}
+      >
         <MoreHorizontal className="size-4" />
         <span className="sr-only">Open actions</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent
+        align="end"
+        onClick={(event: React.MouseEvent) => event.stopPropagation()}
+      >
         <DropdownMenuItem onClick={() => onEdit(property)}>
           <Pencil className="size-4" />
           Edit

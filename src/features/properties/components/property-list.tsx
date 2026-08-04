@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 
 import {
@@ -26,6 +27,7 @@ import { usePropertiesPage } from "../hooks/use-properties";
 import { PropertyFormDialog } from "./property-form-dialog";
 
 export function PropertyList() {
+  const router = useRouter();
   const {
     properties,
     meta,
@@ -75,6 +77,7 @@ export function PropertyList() {
           onSearchChange={handleSearchChange}
           searchPlaceholder="Search properties..."
           onRefresh={refetch}
+          onRowClick={(property) => router.push(`/properties/${property.uuid}`)}
           page={page}
           onPageChange={setPage}
           lastPage={meta?.last_page}

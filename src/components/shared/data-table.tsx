@@ -63,6 +63,7 @@ export type DataTableProps<T> = {
   perPageOptions?: number[];
   toolbarActions?: React.ReactNode;
   maxHeight?: string;
+  onRowClick?: (row: T) => void;
 };
 
 const DEFAULT_PER_PAGE_OPTIONS = [10, 15, 25, 50];
@@ -103,6 +104,7 @@ export function DataTable<T>({
   perPageOptions = DEFAULT_PER_PAGE_OPTIONS,
   toolbarActions,
   maxHeight = "60vh",
+  onRowClick,
 }: DataTableProps<T>) {
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebouncedValue(searchInput, 300);
@@ -169,7 +171,11 @@ export function DataTable<T>({
             </TableHeader>
             <TableBody>
               {data.map((row) => (
-                <TableRow key={getRowId(row)}>
+                <TableRow
+                  key={getRowId(row)}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={cn(onRowClick && "cursor-pointer")}
+                >
                   {columns.map((column) => (
                     <TableCell key={column.id} className={column.cellClassName}>
                       {column.cell(row)}

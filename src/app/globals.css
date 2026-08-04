@@ -132,4 +132,17 @@
   html {
     @apply font-sans;
   }
+  /* The dashboard shell (#dashboard-shell) owns its own fixed-height layout
+     with an internally scrollable <main>. Without this, html/body can still
+     grow a few px taller than the viewport and show their own empty outer
+     scrollbar alongside main's. Scoped via :has() so routes outside the
+     dashboard (e.g. the marketing site) keep normal document scrolling. */
+  html:has(body > #dashboard-shell) {
+    height: 100%;
+    overflow: hidden;
+  }
+  body:has(> #dashboard-shell) {
+    height: 100%;
+    overflow: hidden;
+  }
 }
