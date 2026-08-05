@@ -63,4 +63,12 @@ export const propertyUnitService = {
       `/property-unit/${uuid}/attachments/${attachmentUuid}`,
     );
   },
+  reorderAttachments(uuid: string, attachmentUuids: string[]) {
+    return axiosClient
+      .put<ApiSuccess<PropertyUnit>>(
+        `/property-unit/${uuid}/attachments/reorder`,
+        { attachment_uuids: attachmentUuids },
+      )
+      .then((res) => res.data.data);
+  },
 };

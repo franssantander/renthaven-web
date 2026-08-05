@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const MAX_UNIT_PHOTOS = 4;
+export const MAX_UNIT_GALLERY_PHOTOS = MAX_UNIT_PHOTOS - 1;
+
 export const propertyUnitStatusValues = [
   "available",
   "occupied",

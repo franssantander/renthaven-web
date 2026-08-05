@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ImageOff, Images, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +17,8 @@ import {
   getUnitStatusBadgeVariant,
   getUnitStatusLabel,
 } from "../config/unit-status";
+import { MAX_UNIT_PHOTOS } from "../schemas/property-unit-schema";
+import { UnitPhotoLightbox } from "./unit-photo-lightbox";
 import type { PropertyUnit } from "../types";
 
 type UnitCardProps = {
@@ -29,11 +34,26 @@ export function UnitCard({
   onDelete,
   onManagePhotos,
 }: UnitCardProps) {
-  const coverImage = unit.attachments?.[0]?.url;
+  const attachments = unit.attachments ?? [];
+  const coverImage = attachments[0]?.url;
+
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const openLightbox = (index: number) => {
+    if (!attachments.length) return;
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
   return (
     <Card className="overflow-hidden py-0 gap-0">
-      <div className="relative aspect-video bg-muted">
+      <button
+        type="button"
+        className="relative block aspect-video w-full bg-muted disabled:cursor-default"
+        disabled={!attachments.length}
+        onClick={() => openLightbox(0)}
+      >
         <Avatar className="size-full rounded-none">
           <AvatarImage
             src={coverImage ?? undefined}
@@ -50,7 +70,30 @@ export function UnitCard({
         >
           {getUnitStatusLabel(unit.status)}
         </Badge>
-      </div>
+      </button>
+
+      {attachments.length ? (
+        <div className="grid grid-cols-4 gap-1 bg-muted p-1">
+          {attachments.slice(0, MAX_UNIT_PHOTOS).map((attachment, index) => (
+            <button
+              type="button"
+              key={attachment.uuid}
+              onClick={() => openLightbox(index)}
+            >
+              <Avatar className="aspect-square size-full rounded-sm">
+                <AvatarImage
+                  src={attachment.url}
+                  alt={attachment.original_filename}
+                  className="rounded-sm"
+                />
+                <AvatarFallback className="rounded-sm">
+                  <ImageOff className="size-3 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <CardHeader className="pt-4">
         <div className="flex items-center justify-between gap-2">
@@ -98,6 +141,17 @@ export function UnitCard({
           ))}
         </CardFooter>
       ) : null}
+
+      <UnitPhotoLightbox
+        slides={attachments.map((attachment) => ({
+          src: attachment.url,
+          alt: attachment.original_filename,
+        }))}
+        index={lightboxIndex}
+        open={lightboxOpen}
+        onOpenChange={setLightboxOpen}
+        onIndexChange={setLightboxIndex}
+      />
     </Card>
   );
 }

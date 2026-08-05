@@ -153,3 +153,22 @@ export function useDeletePropertyUnitAttachmentMutation(propertyUuid: string) {
     },
   });
 }
+
+export function useReorderPropertyUnitAttachmentsMutation(propertyUuid: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      uuid,
+      attachmentUuids,
+    }: {
+      uuid: string;
+      attachmentUuids: string[];
+    }) => propertyUnitService.reorderAttachments(uuid, attachmentUuids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["property-units", propertyUuid],
+      });
+    },
+  });
+}

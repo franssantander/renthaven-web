@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { ApiError } from "@/lib/axios";
 import {
   useCreatePropertyUnitMutation,
   useUpdatePropertyUnitMutation,
+  useUploadPropertyUnitAttachmentsMutation,
 } from "../queries/property-unit-query";
 import {
+  MAX_UNIT_GALLERY_PHOTOS,
   propertyUnitSchema,
   type PropertyUnitFormValues,
 } from "../schemas/property-unit-schema";
@@ -42,6 +44,18 @@ function valuesFromUnit(unit?: PropertyUnit | null): PropertyUnitFormState {
       };
 }
 
+function validateProfileImage(file: File): string | undefined {
+  if (!file.type.startsWith("image/")) {
+    return "The profile image must be a valid image file.";
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    return "The profile image must not exceed 5MB.";
+  }
+
+  return undefined;
+}
+
 export function usePropertyUnitForm({
   propertyUuid,
   unit,
@@ -57,13 +71,83 @@ export function usePropertyUnitForm({
     valuesFromUnit(unit),
   );
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profileImageError, setProfileImageError] = useState<
+    string | undefined
+  >();
+  const [galleryPhotos, setGalleryPhotos] = useState<File[]>([]);
+  const [galleryPhotosError, setGalleryPhotosError] = useState<
+    string | undefined
+  >();
 
   const createMutation = useCreatePropertyUnitMutation(propertyUuid);
   const updateMutation = useUpdatePropertyUnitMutation(propertyUuid);
+  const uploadAttachmentsMutation =
+    useUploadPropertyUnitAttachmentsMutation(propertyUuid);
+
+  const profileImagePreview = useMemo(
+    () => (profileImage ? URL.createObjectURL(profileImage) : null),
+    [profileImage],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (profileImagePreview) URL.revokeObjectURL(profileImagePreview);
+    };
+  }, [profileImagePreview]);
+
+  const galleryPreviews = useMemo(
+    () => galleryPhotos.map((file) => URL.createObjectURL(file)),
+    [galleryPhotos],
+  );
+
+  useEffect(() => {
+    return () => {
+      galleryPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [galleryPreviews]);
+
+  const handleProfileImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0] ?? null;
+
+    setProfileImageError(file ? validateProfileImage(file) : undefined);
+    setProfileImage(file);
+    event.target.value = "";
+  };
+
+  const handleGalleryPhotosChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = Array.from(event.target.files ?? []);
+
+    setGalleryPhotosError(
+      files.length > MAX_UNIT_GALLERY_PHOTOS
+        ? `You can upload up to ${MAX_UNIT_GALLERY_PHOTOS} gallery photos.`
+        : undefined,
+    );
+    setGalleryPhotos(files.slice(0, MAX_UNIT_GALLERY_PHOTOS));
+    event.target.value = "";
+  };
+
+  const handleRemoveGalleryPhoto = (index: number) => {
+    setGalleryPhotos((prev) => prev.filter((_, i) => i !== index));
+    setGalleryPhotosError(undefined);
+  };
+
+  const handleClear = () => {
+    setValues(valuesFromUnit(undefined));
+    setFieldErrors({});
+    setProfileImage(null);
+    setProfileImageError(undefined);
+    setGalleryPhotos([]);
+    setGalleryPhotosError(undefined);
+  };
 
   const isPending = isEditing
     ? updateMutation.isPending
-    : createMutation.isPending;
+    : createMutation.isPending || uploadAttachmentsMutation.isPending;
   const mutationError = (isEditing
     ? updateMutation.error
     : createMutation.error) as ApiError | null;
@@ -106,6 +190,11 @@ export function usePropertyUnitForm({
       return;
     }
 
+    if (profileImage && validateProfileImage(profileImage)) {
+      setProfileImageError(validateProfileImage(profileImage));
+      return;
+    }
+
     setFieldErrors({});
 
     try {
@@ -116,7 +205,34 @@ export function usePropertyUnitForm({
         });
         toast.success("Unit updated successfully.");
       } else {
-        await createMutation.mutateAsync([result.data]);
+        const createdUnit = await createMutation.mutateAsync([result.data]);
+
+        try {
+          // Upload the profile image first (its own request) so it gets the
+          // lowest sort_order and becomes attachments[0] / the cover image.
+          if (profileImage) {
+            await uploadAttachmentsMutation.mutateAsync({
+              uuid: createdUnit.uuid,
+              images: [profileImage],
+            });
+          }
+
+          if (galleryPhotos.length) {
+            await uploadAttachmentsMutation.mutateAsync({
+              uuid: createdUnit.uuid,
+              images: galleryPhotos,
+            });
+          }
+        } catch (uploadErr) {
+          toast.error(
+            `Unit created, but photo upload failed: ${(uploadErr as ApiError).message}`,
+          );
+          handleClear();
+          onSuccess();
+          return;
+        }
+
+        handleClear();
         toast.success("Unit created successfully.");
       }
 
@@ -143,10 +259,20 @@ export function usePropertyUnitForm({
     handleStatusChange,
     handleAmenitiesChange,
     handleSubmit,
+    handleClear,
     isPending,
     isEditing,
     nameError: fieldErrors.name ?? getServerError("name"),
     capacityError: fieldErrors.capacity ?? getServerError("capacity"),
     rentPriceError: fieldErrors.rent_price ?? getServerError("rent_price"),
+    profileImage,
+    profileImagePreview,
+    profileImageError,
+    handleProfileImageChange,
+    galleryPhotos,
+    galleryPreviews,
+    galleryPhotosError,
+    handleGalleryPhotosChange,
+    handleRemoveGalleryPhoto,
   };
 }

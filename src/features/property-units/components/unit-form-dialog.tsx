@@ -1,5 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import { ImageOff, X } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +25,7 @@ import {
 import { UNIT_STATUS_OPTIONS, getUnitStatusLabel } from "../config/unit-status";
 import { useUnitAmenitiesQuery } from "../queries/property-unit-query";
 import { usePropertyUnitForm } from "../hooks/use-property-unit-form";
+import { UnitPhotoLightbox } from "./unit-photo-lightbox";
 import type { PropertyUnitStatus } from "../types";
 import type { PropertyUnit } from "../types";
 
@@ -43,11 +48,19 @@ export function UnitFormDialog({
     handleStatusChange,
     handleAmenitiesChange,
     handleSubmit,
+    handleClear,
     isPending,
     isEditing,
     nameError,
     capacityError,
     rentPriceError,
+    profileImagePreview,
+    profileImageError,
+    handleProfileImageChange,
+    galleryPreviews,
+    galleryPhotosError,
+    handleGalleryPhotosChange,
+    handleRemoveGalleryPhoto,
   } = usePropertyUnitForm({
     propertyUuid,
     unit,
@@ -56,6 +69,18 @@ export function UnitFormDialog({
 
   const { data: amenities, isLoading: isLoadingAmenities } =
     useUnitAmenitiesQuery();
+
+  const [lightboxSlides, setLightboxSlides] = useState<
+    { src: string; alt?: string }[]
+  >([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const openLightbox = (slides: { src: string; alt?: string }[], index: number) => {
+    setLightboxSlides(slides);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -174,9 +199,118 @@ export function UnitFormDialog({
                 </SelectContent>
               </Select>
             </Field>
+
+            {!isEditing ? (
+              <>
+                <Field invalid={!!profileImageError}>
+                  <FieldLabel htmlFor="unit-profile-image">
+                    Profile image
+                  </FieldLabel>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      className="shrink-0 disabled:cursor-default"
+                      disabled={!profileImagePreview}
+                      onClick={() =>
+                        profileImagePreview &&
+                        openLightbox([{ src: profileImagePreview }], 0)
+                      }
+                    >
+                      <Avatar size="lg" className="rounded-md">
+                        <AvatarImage
+                          src={profileImagePreview ?? undefined}
+                          className="rounded-md"
+                        />
+                        <AvatarFallback className="rounded-md">
+                          <ImageOff className="size-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
+                    <Input
+                      id="unit-profile-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileImageChange}
+                      aria-invalid={!!profileImageError}
+                      className="flex-1"
+                    />
+                  </div>
+                  {profileImageError ? (
+                    <FieldError>{profileImageError}</FieldError>
+                  ) : null}
+                </Field>
+
+                <Field invalid={!!galleryPhotosError}>
+                  <FieldLabel htmlFor="unit-gallery-photos">
+                    Gallery photos (up to 3)
+                  </FieldLabel>
+                  <Input
+                    id="unit-gallery-photos"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleGalleryPhotosChange}
+                  />
+                  {galleryPhotosError ? (
+                    <FieldError>{galleryPhotosError}</FieldError>
+                  ) : null}
+                  {galleryPreviews.length ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      {galleryPreviews.map((src, index) => (
+                        <div key={src} className="group relative aspect-square">
+                          <button
+                            type="button"
+                            className="size-full"
+                            onClick={() =>
+                              openLightbox(
+                                galleryPreviews.map((previewSrc) => ({
+                                  src: previewSrc,
+                                })),
+                                index,
+                              )
+                            }
+                          >
+                            <Avatar className="size-full rounded-md">
+                              <AvatarImage
+                                src={src}
+                                alt={`Gallery photo ${index + 1}`}
+                                className="rounded-md"
+                              />
+                              <AvatarFallback className="rounded-md">
+                                <ImageOff className="size-4" />
+                              </AvatarFallback>
+                            </Avatar>
+                          </button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon-sm"
+                            className="absolute top-1 right-1"
+                            onClick={() => handleRemoveGalleryPhoto(index)}
+                          >
+                            <X className="size-4" />
+                            <span className="sr-only">Remove photo</span>
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </Field>
+              </>
+            ) : null}
           </div>
 
           <DialogFooter>
+            {!isEditing ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending}
+                onClick={handleClear}
+              >
+                Clear
+              </Button>
+            ) : null}
             <Button type="submit" disabled={isPending}>
               {isPending
                 ? isEditing
@@ -189,6 +323,14 @@ export function UnitFormDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+
+      <UnitPhotoLightbox
+        slides={lightboxSlides}
+        index={lightboxIndex}
+        open={lightboxOpen}
+        onOpenChange={setLightboxOpen}
+        onIndexChange={setLightboxIndex}
+      />
     </Dialog>
   );
 }
