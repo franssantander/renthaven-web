@@ -1,6 +1,9 @@
 import type { PropertyUnitStatus } from "../types";
 
-export const UNIT_STATUS_OPTIONS: { value: PropertyUnitStatus; label: string }[] = [
+export const UNIT_STATUS_OPTIONS: {
+  value: PropertyUnitStatus;
+  label: string;
+}[] = [
   { value: "available", label: "Available" },
   { value: "occupied", label: "Occupied" },
   { value: "partially_occupied", label: "Partially occupied" },
@@ -17,15 +20,24 @@ export function getUnitStatusLabel(status: PropertyUnitStatus): string {
 
 export function getUnitStatusBadgeVariant(
   status: PropertyUnitStatus,
-): "default" | "secondary" | "outline" | "destructive" {
+):
+  | "default"
+  | "secondary"
+  | "outline"
+  | "destructive"
+  | "info"
+  | "warning"
+  | "dark" {
   switch (status) {
     case "available":
       return "default";
     case "maintenance":
       return "destructive";
+    case "partially_occupied":
+      return "warning";
     case "occupied":
     case "full":
-      return "secondary";
+      return "info";
     default:
       return "outline";
   }

@@ -1,4 +1,8 @@
-import type { Amenity, ApiSuccess, Property } from "@/features/properties/types";
+import type {
+  Amenity,
+  ApiSuccess,
+  Property,
+} from "@/features/properties/types";
 
 export type PropertyUnitStatus =
   | "available"
@@ -22,6 +26,7 @@ export type PropertyUnit = {
   property_id: number;
   name: string;
   capacity: number;
+  occupied_count: number;
   rent_price: number;
   status: PropertyUnitStatus;
   property: Property | null;

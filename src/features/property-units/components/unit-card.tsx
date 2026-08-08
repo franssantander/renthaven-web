@@ -1,12 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { ImageOff, Images, MoreHorizontal, Pencil, Trash2, Users } from "lucide-react";
+import {
+  ImageOff,
+  Images,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Users,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,7 +78,7 @@ export function UnitCard({
         </Avatar>
         <Badge
           variant={getUnitStatusBadgeVariant(unit.status)}
-          className="absolute top-2 right-2"
+          className="absolute top-6 right-6"
         >
           {getUnitStatusLabel(unit.status)}
         </Badge>
@@ -99,7 +111,9 @@ export function UnitCard({
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-medium">{unit.name}</h3>
           <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+            <DropdownMenuTrigger
+              render={<Button variant="ghost" size="icon-sm" />}
+            >
               <MoreHorizontal className="size-4" />
               <span className="sr-only">Open actions</span>
             </DropdownMenuTrigger>
@@ -112,7 +126,10 @@ export function UnitCard({
                 <Images className="size-4" />
                 Manage photos
               </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={() => onDelete(unit)}>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => onDelete(unit)}
+              >
                 <Trash2 className="size-4" />
                 Delete
               </DropdownMenuItem>
@@ -121,10 +138,10 @@ export function UnitCard({
         </div>
       </CardHeader>
 
-      <CardContent className="flex items-center justify-between text-sm text-muted-foreground">
+      <CardContent className="flex items-center justify-between text-sm text-muted-foreground space-y-3">
         <span className="flex items-center gap-1">
           <Users className="size-4" />
-          {unit.capacity}
+          Occupied: {unit.occupied_count} / {unit.capacity}
         </span>
         <span className="font-medium text-foreground">
           {new Intl.NumberFormat("en-US").format(unit.rent_price)}
