@@ -52,6 +52,7 @@ export function PropertyUnitList({ propertyUuid }: PropertyUnitListProps) {
       <CardContent>
         <UnitList
           units={units}
+          propertyUuid={propertyUuid}
           isLoading={isLoading}
           isFetching={isFetching}
           isError={isError}

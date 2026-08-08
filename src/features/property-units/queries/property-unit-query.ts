@@ -31,6 +31,14 @@ export function usePropertyUnitsInfiniteQuery(
   });
 }
 
+export function usePropertyUnitQuery(uuid: string) {
+  return useQuery({
+    queryKey: ["property-units", "detail", uuid],
+    queryFn: () => propertyUnitService.get(uuid),
+    enabled: Boolean(uuid),
+  });
+}
+
 export function usePropertyUnitDashboardQuery(propertyUuid: string) {
   return useQuery({
     queryKey: ["property-units", propertyUuid, "dashboard"],

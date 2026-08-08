@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
+  Eye,
   ImageOff,
   Images,
   MoreHorizontal,
@@ -35,6 +37,7 @@ import type { PropertyUnit } from "../types";
 
 type UnitCardProps = {
   unit: PropertyUnit;
+  propertyUuid: string;
   onEdit: (unit: PropertyUnit) => void;
   onDelete: (unit: PropertyUnit) => void;
   onManagePhotos: (unit: PropertyUnit) => void;
@@ -42,6 +45,7 @@ type UnitCardProps = {
 
 export function UnitCard({
   unit,
+  propertyUuid,
   onEdit,
   onDelete,
   onManagePhotos,
@@ -118,6 +122,14 @@ export function UnitCard({
               <span className="sr-only">Open actions</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                render={
+                  <Link href={`/properties/${propertyUuid}/units/${unit.uuid}`} />
+                }
+              >
+                <Eye className="size-4" />
+                View details
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(unit)}>
                 <Pencil className="size-4" />
                 Edit

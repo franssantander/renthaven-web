@@ -15,6 +15,11 @@ export const propertyUnitService = {
       .get<PaginatedPropertyUnits>("/property-unit", { params })
       .then((res) => res.data);
   },
+  get(uuid: string) {
+    return axiosClient
+      .get<ApiSuccess<PropertyUnit>>(`/property-unit/${uuid}`)
+      .then((res) => res.data.data);
+  },
   dashboard(propertyUuid: string) {
     return axiosClient
       .get<ApiSuccess<PropertyUnitDashboardMetrics>>("/property-unit/dashboard", {

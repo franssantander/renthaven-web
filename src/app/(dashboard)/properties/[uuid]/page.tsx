@@ -18,7 +18,7 @@ export default async function PropertyUnitsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
+      <div className="flex justify-end">
         <BackButton />
       </div>
       <PropertySummaryCard propertyUuid={uuid} />

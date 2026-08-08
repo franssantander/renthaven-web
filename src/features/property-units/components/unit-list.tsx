@@ -13,6 +13,7 @@ import type { PropertyUnit } from "../types";
 
 type UnitListProps = {
   units: PropertyUnit[];
+  propertyUuid: string;
   isLoading?: boolean;
   isFetching?: boolean;
   isError?: boolean;
@@ -30,6 +31,7 @@ type UnitListProps = {
 
 export function UnitList({
   units,
+  propertyUuid,
   isLoading,
   isFetching,
   isError,
@@ -121,6 +123,7 @@ export function UnitList({
               <UnitCard
                 key={unit.uuid}
                 unit={unit}
+                propertyUuid={propertyUuid}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onManagePhotos={onManagePhotos}
