@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, PanelLeft, PanelLeftClose } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -31,17 +31,16 @@ import {
 } from "../config/nav-items";
 import { getInitials } from "../lib/get-initials";
 import { useLogout } from "../hooks/use-logout";
-import { useSidebar } from "../hooks/use-sidebar";
 
 type DashboardSidebarProps = {
   currentUser: CurrentUser | undefined;
+  isCollapsed: boolean;
   isMobileNavOpen: boolean;
   onMobileNavOpenChange: (open: boolean) => void;
 };
 
 function SidebarBrand({
   isCollapsed,
-  toggleButton,
 }: {
   isCollapsed: boolean;
   toggleButton?: React.ReactNode;
@@ -58,12 +57,11 @@ function SidebarBrand({
         alt="RentHaven"
         width={28}
         height={28}
-        className={cn("size-7 shrink-0", isCollapsed && "md:hidden")}
+        className={cn("size-7 shrink-0")}
       />
       {!isCollapsed ? (
         <span className="mr-auto truncate font-semibold">RentHaven</span>
       ) : null}
-      {toggleButton}
     </div>
   );
 }
@@ -192,29 +190,11 @@ function SidebarUserFooter({
 
 export function DashboardSidebar({
   currentUser,
+  isCollapsed,
   isMobileNavOpen,
   onMobileNavOpenChange,
 }: DashboardSidebarProps) {
-  const { isCollapsed, toggleSidebar } = useSidebar();
   const items = getNavItemsForRole(currentUser?.role.slug);
-
-  const toggleButton = (
-    <Button
-      variant="ghost"
-      size="icon"
-      className={cn(isCollapsed && "mx-auto")}
-      onClick={toggleSidebar}
-    >
-      {isCollapsed ? (
-        <PanelLeft className="size-4" />
-      ) : (
-        <PanelLeftClose className="size-4" />
-      )}
-      <span className="sr-only">
-        {isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-      </span>
-    </Button>
-  );
 
   return (
     <>
@@ -225,19 +205,7 @@ export function DashboardSidebar({
           isCollapsed ? "w-16" : "w-64",
         )}
       >
-        <SidebarBrand
-          isCollapsed={isCollapsed}
-          toggleButton={
-            isCollapsed ? (
-              <Tooltip>
-                <TooltipTrigger render={toggleButton} />
-                <TooltipContent side="right">Expand sidebar</TooltipContent>
-              </Tooltip>
-            ) : (
-              toggleButton
-            )
-          }
-        />
+        <SidebarBrand isCollapsed={isCollapsed} />
         <SidebarNav items={items} isCollapsed={isCollapsed} />
         <SidebarUserFooter
           currentUser={currentUser}

@@ -7,6 +7,7 @@ import { useRoleGate } from "@/features/auth/hooks/use-role-gate";
 import { STAFF_ROLES } from "@/features/auth/lib/role-routes";
 import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
 import { DashboardSidebar } from "@/features/dashboard/components/dashboard-sidebar";
+import { useSidebar } from "@/features/dashboard/hooks/use-sidebar";
 
 function DashboardLoadingSkeleton() {
   return (
@@ -43,6 +44,7 @@ export default function DashboardLayout({
 }>) {
   const { isReady, currentUser } = useRoleGate(STAFF_ROLES);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const { isCollapsed, toggleSidebar } = useSidebar();
 
   if (!isReady) {
     return <DashboardLoadingSkeleton />;
@@ -52,11 +54,14 @@ export default function DashboardLayout({
     <div id="dashboard-shell" className="flex h-screen overflow-hidden">
       <DashboardSidebar
         currentUser={currentUser}
+        isCollapsed={isCollapsed}
         isMobileNavOpen={isMobileNavOpen}
         onMobileNavOpenChange={setIsMobileNavOpen}
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <DashboardHeader
+          isCollapsed={isCollapsed}
+          toggleSidebar={toggleSidebar}
           onMobileMenuClick={() => setIsMobileNavOpen(true)}
         />
         <main className="min-h-0 flex-1 overflow-y-auto p-6">{children}</main>

@@ -5,12 +5,19 @@ import { Bell, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getPageTitle } from "../config/nav-items";
+import ToggleSidebar from "./toggle-sidebar";
 
 type DashboardHeaderProps = {
+  isCollapsed: boolean;
+  toggleSidebar: () => void;
   onMobileMenuClick: () => void;
 };
 
-export function DashboardHeader({ onMobileMenuClick }: DashboardHeaderProps) {
+export function DashboardHeader({
+  isCollapsed,
+  toggleSidebar,
+  onMobileMenuClick,
+}: DashboardHeaderProps) {
   const pathname = usePathname();
 
   return (
@@ -25,6 +32,11 @@ export function DashboardHeader({ onMobileMenuClick }: DashboardHeaderProps) {
           <Menu className="size-4" />
           <span className="sr-only">Open navigation</span>
         </Button>
+        <ToggleSidebar
+          className="hidden md:flex"
+          isCollapsed={isCollapsed}
+          toggleSidebar={toggleSidebar}
+        />
         <h1 className="text-sm font-semibold">{getPageTitle(pathname)}</h1>
       </div>
       <Button variant="outline" size="icon">
