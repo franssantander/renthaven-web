@@ -2,6 +2,7 @@ import {
   Building2,
   LayoutDashboard,
   Settings,
+  UserCog,
   Users,
   Wrench,
   type LucideIcon,
@@ -40,6 +41,12 @@ export const navItems: NavItem[] = [
     href: "/maintenance",
     label: "Maintenance",
     icon: Wrench,
+    roles: [...STAFF_ROLES],
+  },
+  {
+    href: "/user-management",
+    label: "User Management",
+    icon: UserCog,
     roles: [...STAFF_ROLES],
   },
   {

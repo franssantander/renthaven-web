@@ -92,7 +92,7 @@ function SidebarNav({
               "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
               isCollapsed && "justify-center px-0",
               isActive &&
-                "mx-auto bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                "mx-auto bg-sidebar-primary text-sidebar-primary-foreground dark:text-white hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
             )}
           >
             <item.icon className="size-4 shrink-0" />
@@ -201,7 +201,7 @@ export function DashboardSidebar({
       <aside
         data-collapsed={isCollapsed}
         className={cn(
-          "hidden h-full shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all md:flex",
+          "hidden h-full shrink-0 flex-col border-r border-sidebar-border  text-sidebar-foreground transition-all md:flex",
           isCollapsed ? "w-16" : "w-64",
         )}
       >

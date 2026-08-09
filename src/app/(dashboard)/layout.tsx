@@ -64,7 +64,9 @@ export default function DashboardLayout({
           toggleSidebar={toggleSidebar}
           onMobileMenuClick={() => setIsMobileNavOpen(true)}
         />
-        <main className="min-h-0 flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="bg-[#f9f9f9] dark:bg-[#0a0a0a] min-h-0 flex-1 overflow-y-auto p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

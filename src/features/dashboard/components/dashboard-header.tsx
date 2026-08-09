@@ -5,6 +5,7 @@ import { Bell, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getPageTitle } from "../config/nav-items";
+import { ThemeToggle } from "./theme-toggle";
 import ToggleSidebar from "./toggle-sidebar";
 
 type DashboardHeaderProps = {
@@ -39,9 +40,12 @@ export function DashboardHeader({
         />
         <h1 className="text-sm font-semibold">{getPageTitle(pathname)}</h1>
       </div>
-      <Button variant="outline" size="icon">
-        <Bell className="size-4" />
-      </Button>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <Button variant="outline" size="icon">
+          <Bell className="size-4" />
+        </Button>
+      </div>
     </header>
   );
 }
