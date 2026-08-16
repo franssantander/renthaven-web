@@ -15,6 +15,7 @@ export const config = {
     "/dashboard/:path*",
     "/properties/:path*",
     "/tenants/:path*",
+    "/ledger/:path*",
     "/maintenance/:path*",
     "/settings/:path*",
     "/tenant/:path*",

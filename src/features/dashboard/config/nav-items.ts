@@ -1,6 +1,7 @@
 import {
   Building2,
   LayoutDashboard,
+  Receipt,
   Settings,
   UserCog,
   Users,
@@ -35,6 +36,12 @@ export const navItems: NavItem[] = [
     href: "/tenants",
     label: "Tenants",
     icon: Users,
+    roles: [...STAFF_ROLES],
+  },
+  {
+    href: "/ledger",
+    label: "Ledger",
+    icon: Receipt,
     roles: [...STAFF_ROLES],
   },
   {

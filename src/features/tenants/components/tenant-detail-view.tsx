@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, type badgeVariants } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -17,27 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { LedgerEntry, LedgerStatus } from "@/features/ledger/types";
+import {
+  getLedgerStatusBadgeVariant,
+  getLedgerStatusLabel,
+} from "@/features/ledger/config/ledger-status";
+import type { LedgerEntry } from "@/features/ledger/types";
 import { useTenantDetail } from "../hooks/use-tenant-detail";
-import type { VariantProps } from "class-variance-authority";
-
-type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
-
-const LEDGER_STATUS_VARIANT: Record<LedgerStatus, BadgeVariant> = {
-  pending: "outline",
-  partially_paid: "warning",
-  paid: "default",
-  overdue: "destructive",
-  submitted: "info",
-};
-
-const LEDGER_STATUS_LABEL: Record<LedgerStatus, string> = {
-  pending: "Pending",
-  partially_paid: "Partially paid",
-  paid: "Paid",
-  overdue: "Overdue",
-  submitted: "Awaiting approval",
-};
 
 function formatDate(date: string | null): string {
   if (!date) return "—";
@@ -175,8 +160,8 @@ export function TenantDetailView({ leaseUuid, unitUuid }: TenantDetailViewProps)
                         {formatAmount(entry.balance)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={LEDGER_STATUS_VARIANT[entry.status]}>
-                          {LEDGER_STATUS_LABEL[entry.status]}
+                        <Badge variant={getLedgerStatusBadgeVariant(entry.status)}>
+                          {getLedgerStatusLabel(entry.status)}
                         </Badge>
                       </TableCell>
                     </TableRow>
