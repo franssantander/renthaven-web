@@ -1,8 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { leaseService } from "../services/lease-service";
 import type {
   CreateLeasePayload,
+  ListLeasesParams,
   ReassignLeasePayload,
   TerminateLeasePayload,
 } from "../types";
@@ -12,6 +18,14 @@ export function useUnitLeasesQuery(propertyUnitUuid: string) {
     queryKey: ["leases", propertyUnitUuid],
     queryFn: () => leaseService.list({ property_unit_uuid: propertyUnitUuid }),
     enabled: Boolean(propertyUnitUuid),
+  });
+}
+
+export function useLeasesQuery(params: ListLeasesParams) {
+  return useQuery({
+    queryKey: ["leases", params],
+    queryFn: () => leaseService.list(params),
+    placeholderData: keepPreviousData,
   });
 }
 

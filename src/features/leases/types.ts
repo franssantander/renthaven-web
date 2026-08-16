@@ -48,7 +48,7 @@ export type PaginatedLeases = {
 };
 
 export type ListLeasesParams = {
-  property_unit_uuid: string;
+  property_unit_uuid?: string;
   page?: number;
   per_page?: number;
 };
