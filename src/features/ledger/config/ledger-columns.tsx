@@ -1,4 +1,10 @@
-import { CheckCircle2, ImageIcon, MoreHorizontal, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  ImageIcon,
+  Mail,
+  MoreHorizontal,
+  XCircle,
+} from "lucide-react";
 
 import type { DataTableColumn } from "@/components/shared/data-table";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +38,7 @@ export type LedgerColumnActions = {
   onMarkPaid: (entry: LedgerEntry) => void;
   onReject: (entry: LedgerEntry) => void;
   onViewProof: (entry: LedgerEntry) => void;
+  onSendReminder: (entry: LedgerEntry) => void;
 };
 
 type LedgerActionsCellProps = LedgerColumnActions & {
@@ -43,11 +50,13 @@ function LedgerActionsCell({
   onMarkPaid,
   onReject,
   onViewProof,
+  onSendReminder,
 }: LedgerActionsCellProps) {
   const canMarkPaid = entry.status !== "paid";
   const canReject = entry.status === "submitted";
   const canViewProof = !!entry.attachments?.length;
-  const hasActions = canMarkPaid || canReject || canViewProof;
+  const canSendReminder = entry.status === "overdue";
+  const hasActions = canMarkPaid || canReject || canViewProof || canSendReminder;
 
   if (!hasActions) {
     return null;
@@ -72,6 +81,12 @@ function LedgerActionsCell({
             Reject claim
           </DropdownMenuItem>
         ) : null}
+        {canSendReminder ? (
+          <DropdownMenuItem onClick={() => onSendReminder(entry)}>
+            <Mail className="size-4" />
+            Send payment reminder
+          </DropdownMenuItem>
+        ) : null}
         {canViewProof ? (
           <DropdownMenuItem onClick={() => onViewProof(entry)}>
             <ImageIcon className="size-4" />
@@ -87,6 +102,7 @@ export function getLedgerColumns({
   onMarkPaid,
   onReject,
   onViewProof,
+  onSendReminder,
 }: LedgerColumnActions): DataTableColumn<LedgerEntry>[] {
   return [
     {
@@ -160,6 +176,7 @@ export function getLedgerColumns({
           onMarkPaid={onMarkPaid}
           onReject={onReject}
           onViewProof={onViewProof}
+          onSendReminder={onSendReminder}
         />
       ),
     },

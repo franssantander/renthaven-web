@@ -22,6 +22,7 @@ import type { LedgerEntry, LedgerStatus } from "../types";
 import { LedgerDashboardCards } from "./ledger-dashboard-cards";
 import { MarkPaidDialog } from "./mark-paid-dialog";
 import { RejectPaymentDialog } from "./reject-payment-dialog";
+import { SendReminderDialog } from "./send-reminder-dialog";
 
 export function LedgerList() {
   const {
@@ -42,6 +43,8 @@ export function LedgerList() {
     setPayingEntry,
     rejectingEntry,
     setRejectingEntry,
+    sendingReminderEntry,
+    setSendingReminderEntry,
   } = useLedgerList();
 
   const handleViewProof = (entry: LedgerEntry) => {
@@ -55,6 +58,7 @@ export function LedgerList() {
     onMarkPaid: setPayingEntry,
     onReject: setRejectingEntry,
     onViewProof: handleViewProof,
+    onSendReminder: setSendingReminderEntry,
   });
 
   return (
@@ -130,6 +134,14 @@ export function LedgerList() {
           if (!open) setRejectingEntry(null);
         }}
         entry={rejectingEntry}
+      />
+
+      <SendReminderDialog
+        open={!!sendingReminderEntry}
+        onOpenChange={(open) => {
+          if (!open) setSendingReminderEntry(null);
+        }}
+        entry={sendingReminderEntry}
       />
     </div>
   );

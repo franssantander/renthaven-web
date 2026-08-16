@@ -72,3 +72,12 @@ export function useRejectPaymentMutation() {
     onSuccess: invalidate,
   });
 }
+
+export function useSendReminderMutation() {
+  const invalidate = useInvalidateAfterLedgerChange();
+
+  return useMutation({
+    mutationFn: (uuid: string) => ledgerService.sendReminder(uuid),
+    onSuccess: invalidate,
+  });
+}

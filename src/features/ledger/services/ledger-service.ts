@@ -30,4 +30,9 @@ export const ledgerService = {
       .put<ApiSuccess<LedgerEntry>>(`/ledger/${uuid}/reject`, data)
       .then((res) => res.data.data);
   },
+  sendReminder(uuid: string) {
+    return axiosClient
+      .put<ApiSuccess<LedgerEntry>>(`/ledger/${uuid}/send-reminder`)
+      .then((res) => res.data.data);
+  },
 };

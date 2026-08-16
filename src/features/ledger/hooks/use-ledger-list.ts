@@ -34,6 +34,8 @@ export function useLedgerList() {
   const [rejectingEntry, setRejectingEntry] = useState<LedgerEntry | null>(
     null,
   );
+  const [sendingReminderEntry, setSendingReminderEntry] =
+    useState<LedgerEntry | null>(null);
 
   return {
     entries: data?.data ?? [],
@@ -53,5 +55,7 @@ export function useLedgerList() {
     setPayingEntry,
     rejectingEntry,
     setRejectingEntry,
+    sendingReminderEntry,
+    setSendingReminderEntry,
   };
 }
