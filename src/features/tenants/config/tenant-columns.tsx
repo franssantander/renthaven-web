@@ -40,18 +40,14 @@ export function getTenantColumns(): DataTableColumn<Lease>[] {
       cell: (lease) => <TenantCell lease={lease} />,
     },
     {
+      id: "property",
+      header: "Property",
+      cell: (lease) => lease.property_unit?.property?.name ?? "—",
+    },
+    {
       id: "unit",
       header: "Unit",
-      cell: (lease) => (
-        <div>
-          <p className="font-medium">
-            {lease.property_unit?.property?.name ?? "—"}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {lease.property_unit?.name ?? "—"}
-          </p>
-        </div>
-      ),
+      cell: (lease) => lease.property_unit?.name ?? "—",
     },
     {
       id: "term_type",
