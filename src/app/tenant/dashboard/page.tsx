@@ -1,24 +1,13 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { TenantLeaseCard } from "@/features/tenant/components/tenant-lease-card";
+import { TenantProfileCard } from "@/features/tenant/components/tenant-profile-card";
+import { TenantTransactionsList } from "@/features/tenant/components/tenant-transactions-list";
 
 export default function TenantDashboardPage() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Welcome to your portal</CardTitle>
-        <CardDescription>
-          This is your tenant dashboard. More features are coming soon.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">
-        Check back here for updates on your lease, payments, and maintenance
-        requests.
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-6">
+      <TenantProfileCard />
+      <TenantLeaseCard />
+      <TenantTransactionsList />
+    </div>
   );
 }

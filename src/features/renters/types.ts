@@ -5,7 +5,9 @@ export type Renter = {
   uuid: string;
   user_uuid: string | null;
   first_name: string;
+  middle_name: string | null;
   last_name: string;
+  full_name: string;
   email: string;
   phone: string | null;
 };

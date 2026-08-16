@@ -238,6 +238,19 @@ export function AssignTenantDialog({
                     ) : null}
                   </Field>
                 </div>
+                <Field invalid={!!fieldError("middle_name")}>
+                  <FieldLabel htmlFor="tenant-middle-name">
+                    Middle name (optional)
+                  </FieldLabel>
+                  <Input
+                    id="tenant-middle-name"
+                    value={values.middle_name}
+                    onChange={handleChange("middle_name")}
+                  />
+                  {fieldError("middle_name") ? (
+                    <FieldError>{fieldError("middle_name")}</FieldError>
+                  ) : null}
+                </Field>
                 <Field invalid={!!fieldError("email")}>
                   <FieldLabel htmlFor="tenant-email">Email</FieldLabel>
                   <Input

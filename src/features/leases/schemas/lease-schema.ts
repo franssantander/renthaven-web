@@ -8,6 +8,7 @@ export const assignTenantSchema = z.object({
   mode: z.enum(tenantModeValues),
   renter_uuid: z.string().optional(),
   first_name: z.string().trim().optional(),
+  middle_name: z.string().trim().optional(),
   last_name: z.string().trim().optional(),
   email: z.string().trim().optional(),
   phone: z.string().trim().optional(),

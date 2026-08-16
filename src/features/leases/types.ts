@@ -57,6 +57,7 @@ export type LeaseTenantInput =
   | { uuid: string; security_deposit?: number; advance_rent?: number }
   | {
       first_name: string;
+      middle_name?: string;
       last_name: string;
       email: string;
       phone?: string;

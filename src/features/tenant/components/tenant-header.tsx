@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -34,7 +36,16 @@ export function TenantHeader({ currentUser }: TenantHeaderProps) {
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-sm supports-backdrop-filter:bg-background/60 sm:px-6">
-      <h1 className="text-sm font-semibold">Tenant Portal</h1>
+      <div className="flex items-center gap-2">
+        <Image
+          src="/images/renthaven-logo-svg.svg"
+          alt="RentHaven"
+          width={28}
+          height={28}
+          className="size-7"
+        />
+        <h1 className="text-sm font-semibold">Tenant Portal</h1>
+      </div>
 
       {currentUser ? (
         <DropdownMenu>
@@ -56,12 +67,14 @@ export function TenantHeader({ currentUser }: TenantHeaderProps) {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <p className="text-sm font-medium">{currentUser.full_name}</p>
-              <p className="text-xs font-normal text-muted-foreground">
-                {currentUser.role.role_name}
-              </p>
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                <p className="text-sm font-medium">{currentUser.full_name}</p>
+                <p className="text-xs font-normal text-muted-foreground">
+                  {currentUser.role.role_name}
+                </p>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"

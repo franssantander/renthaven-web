@@ -14,6 +14,7 @@ type FormState = {
   mode: AssignTenantFormValues["mode"];
   renter_uuid: string;
   first_name: string;
+  middle_name: string;
   last_name: string;
   email: string;
   phone: string;
@@ -28,6 +29,7 @@ const initialState: FormState = {
   mode: "new",
   renter_uuid: "",
   first_name: "",
+  middle_name: "",
   last_name: "",
   email: "",
   phone: "",
@@ -55,7 +57,7 @@ export function useAssignTenantForm({
   const mutation = useAssignTenantMutation();
 
   const handleChange =
-    (field: "first_name" | "last_name" | "email" | "phone" | "start_date" | "end_date" | "security_deposit" | "advance_rent") =>
+    (field: "first_name" | "middle_name" | "last_name" | "email" | "phone" | "start_date" | "end_date" | "security_deposit" | "advance_rent") =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setValues((prev) => ({ ...prev, [field]: event.target.value }));
       setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -143,6 +145,7 @@ export function useAssignTenantForm({
           }
         : {
             first_name: data.first_name!,
+            middle_name: data.middle_name || undefined,
             last_name: data.last_name!,
             email: data.email!,
             phone: data.phone || undefined,
