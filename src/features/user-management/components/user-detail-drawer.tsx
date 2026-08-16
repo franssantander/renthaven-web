@@ -15,6 +15,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCurrentUserQuery } from "@/features/auth/queries/auth-query";
 import { getInitials } from "@/features/dashboard/lib/get-initials";
 import { useUserForm } from "../hooks/use-user-form";
@@ -28,11 +33,13 @@ type UserDetailDrawerProps = {
   onDeleteRequest: (user: SystemUser) => void;
 };
 
-function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex min-w-0 flex-col gap-0.5">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm">{value}</span>
+      <span className="truncate text-sm" title={value}>
+        {value}
+      </span>
     </div>
   );
 }
@@ -49,14 +56,9 @@ function UserEditForm({
   return (
     <form onSubmit={form.handleSubmit} noValidate className="flex flex-col gap-4">
       <UserFormFields idPrefix="edit-user" {...form} />
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={form.isPending}>
-          {form.isPending ? "Saving..." : "Save changes"}
-        </Button>
-        <Button type="button" variant="outline" onClick={onDone}>
-          Cancel
-        </Button>
-      </div>
+      <Button type="submit" disabled={form.isPending}>
+        {form.isPending ? "Saving..." : "Save changes"}
+      </Button>
     </form>
   );
 }
@@ -64,9 +66,11 @@ function UserEditForm({
 function UserDetailBody({
   uuid,
   onDeleteRequest,
+  onClose,
 }: {
   uuid: string;
   onDeleteRequest: (user: SystemUser) => void;
+  onClose: () => void;
 }) {
   const [editMode, setEditMode] = useState(false);
   const { data: user, isLoading } = useUserQuery(uuid);
@@ -75,53 +79,72 @@ function UserDetailBody({
 
   return (
     <>
-      <SheetHeader>
-        <SheetTitle className="sr-only">User details</SheetTitle>
+      <SheetHeader className="gap-0 border-b bg-muted/30 px-6 py-5">
         {isLoading || !user ? (
           <div className="flex items-center gap-3">
+            <SheetTitle className="sr-only">User details</SheetTitle>
             <Skeleton className="size-10 rounded-full" />
             <Skeleton className="h-5 w-40" />
           </div>
         ) : (
-          <div className="flex items-center gap-3">
-            <Avatar size="lg">
-              <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <p className="font-medium">{user.full_name}</p>
-              <Badge variant={user.status === "active" ? "info" : "secondary"}>
-                {user.status === "active" ? "Active" : "Inactive"}
-              </Badge>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <Avatar size="lg" className="shadow-sm ring-2 ring-background">
+                <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <SheetTitle className="truncate text-base font-semibold">
+                  {user.full_name}
+                </SheetTitle>
+                <Badge
+                  variant={user.status === "active" ? "info" : "secondary"}
+                  className="mt-1"
+                >
+                  {user.status === "active" ? "Active" : "Inactive"}
+                </Badge>
+              </div>
             </div>
-            {!editMode ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setEditMode(true)}
-              >
-                <Pencil className="size-4" />
-                Edit
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => setEditMode(false)}
-              >
-                <X className="size-4" />
-                <span className="sr-only">Cancel edit</span>
-              </Button>
-            )}
+            <div className="flex shrink-0 items-center gap-1">
+              {!editMode ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditMode(true)}
+                >
+                  <Pencil className="size-4" />
+                  Edit
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditMode(false)}
+                >
+                  Cancel
+                </Button>
+              )}
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button variant="ghost" size="icon-sm" onClick={onClose} />
+                  }
+                >
+                  <X className="size-4" />
+                  <span className="sr-only">Close</span>
+                </TooltipTrigger>
+                <TooltipContent>Close</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         )}
-        <SheetDescription>
+        <SheetDescription className="mt-2">
           {editMode
             ? "Update this user's account details."
             : "View this user's account details."}
         </SheetDescription>
       </SheetHeader>
 
-      <div className="flex-1 overflow-y-auto px-4">
+      <div className="flex-1 overflow-y-auto px-6 py-4">
         {isLoading || !user ? (
           <div className="flex flex-col gap-3">
             <Skeleton className="h-9 w-full" />
@@ -132,7 +155,7 @@ function UserDetailBody({
           <UserEditForm user={user} onDone={() => setEditMode(false)} />
         ) : (
           <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               <DetailRow label="Username" value={user.username} />
               <DetailRow label="Role" value={user.role.role_name} />
               <DetailRow label="Email" value={user.email} />
@@ -146,7 +169,7 @@ function UserDetailBody({
       </div>
 
       {!isLoading && user && !editMode ? (
-        <SheetFooter className="border-t border-destructive/30 bg-destructive/5">
+        <SheetFooter className="border-t border-destructive/30 bg-destructive/5 px-6 py-4">
           <p className="text-sm font-medium text-destructive">Danger zone</p>
           <p className="text-xs text-muted-foreground">
             Deleting a user is permanent and cannot be undone.
@@ -159,6 +182,11 @@ function UserDetailBody({
           >
             Delete user
           </Button>
+          {isSelf ? (
+            <p className="text-xs text-muted-foreground">
+              You can&apos;t delete your own account.
+            </p>
+          ) : null}
         </SheetFooter>
       ) : null}
     </>
@@ -172,12 +200,17 @@ export function UserDetailDrawer({
 }: UserDetailDrawerProps) {
   return (
     <Sheet open={!!uuid} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        className="flex w-full flex-col gap-0 sm:max-w-md"
+      >
         {uuid ? (
           <UserDetailBody
             key={uuid}
             uuid={uuid}
             onDeleteRequest={onDeleteRequest}
+            onClose={() => onOpenChange(false)}
           />
         ) : null}
       </SheetContent>
