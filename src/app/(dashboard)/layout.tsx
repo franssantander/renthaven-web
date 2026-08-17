@@ -60,6 +60,7 @@ export default function DashboardLayout({
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <DashboardHeader
+          userId={currentUser?.id}
           isCollapsed={isCollapsed}
           toggleSidebar={toggleSidebar}
           onMobileMenuClick={() => setIsMobileNavOpen(true)}

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { CurrentUser } from "@/features/auth/types";
 import { useLogout } from "@/features/dashboard/hooks/use-logout";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
 
 type TenantHeaderProps = {
   currentUser: CurrentUser | undefined;
@@ -48,7 +49,9 @@ export function TenantHeader({ currentUser }: TenantHeaderProps) {
       </div>
 
       {currentUser ? (
-        <DropdownMenu>
+        <div className="flex items-center gap-2">
+          <NotificationBell userId={currentUser.id} />
+          <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <Button variant="ghost" className="h-auto gap-2 px-1.5 py-1" />
@@ -85,7 +88,8 @@ export function TenantHeader({ currentUser }: TenantHeaderProps) {
               {isPendingLogout ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+        </div>
       ) : null}
     </header>
   );

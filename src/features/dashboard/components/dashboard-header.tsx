@@ -1,20 +1,23 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Bell, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { getPageTitle } from "../config/nav-items";
 import { ThemeToggle } from "./theme-toggle";
 import ToggleSidebar from "./toggle-sidebar";
 
 type DashboardHeaderProps = {
+  userId: number | undefined;
   isCollapsed: boolean;
   toggleSidebar: () => void;
   onMobileMenuClick: () => void;
 };
 
 export function DashboardHeader({
+  userId,
   isCollapsed,
   toggleSidebar,
   onMobileMenuClick,
@@ -42,9 +45,7 @@ export function DashboardHeader({
       </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
-        <Button variant="outline" size="icon">
-          <Bell className="size-4" />
-        </Button>
+        <NotificationBell userId={userId} />
       </div>
     </header>
   );
