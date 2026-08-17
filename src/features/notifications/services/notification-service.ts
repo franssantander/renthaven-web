@@ -1,12 +1,13 @@
 import { axiosClient } from "@/lib/axios";
 import type {
+  NotificationListParams,
   NotificationListResponse,
   NotificationResponse,
   UnreadCountResponse,
 } from "../types";
 
 export const notificationService = {
-  list(params?: { per_page?: number; unread_only?: boolean }) {
+  list(params?: NotificationListParams) {
     return axiosClient
       .get<NotificationListResponse>("/notifications", { params })
       .then((res) => res.data);

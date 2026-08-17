@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Bell,
   CircleAlert,
@@ -18,6 +19,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { NotificationRealtime } from "./notification-realtime";
 import {
@@ -26,7 +33,7 @@ import {
   useNotificationsQuery,
   useUnreadCountQuery,
 } from "../queries/notification-query";
-import type { Notification } from "../types";
+import type { Notification, NotificationReadFilter } from "../types";
 
 type NotificationBellProps = {
   userId: number | undefined;
@@ -109,7 +116,8 @@ function NotificationRow({
 }
 
 export function NotificationBell({ userId }: NotificationBellProps) {
-  const notificationsQuery = useNotificationsQuery();
+  const [filter, setFilter] = useState<NotificationReadFilter>("all");
+  const notificationsQuery = useNotificationsQuery(filter);
   const unreadCountQuery = useUnreadCountQuery();
   const markRead = useMarkReadMutation();
   const markAllRead = useMarkAllReadMutation();
@@ -117,6 +125,20 @@ export function NotificationBell({ userId }: NotificationBellProps) {
   const notifications = notificationsQuery.data?.data ?? [];
   const unreadCount = unreadCountQuery.data?.data.unread_count ?? 0;
   const badgeLabel = unreadCount > 99 ? "99+" : String(unreadCount);
+  const emptyState = {
+    all: {
+      title: "No notifications yet",
+      description: "New activity will appear here.",
+    },
+    read: {
+      title: "No read notifications",
+      description: "Notifications you read will appear here.",
+    },
+    unread: {
+      title: "You are all caught up",
+      description: "You have no unread notifications.",
+    },
+  }[filter];
 
   return (
     <>
@@ -171,55 +193,76 @@ export function NotificationBell({ userId }: NotificationBellProps) {
             </Button>
           </div>
 
-          <div className="max-h-[min(28rem,70vh)] overflow-y-auto">
-            {notificationsQuery.isLoading ? (
-              <>
-                <NotificationSkeleton />
-                <NotificationSkeleton />
-                <NotificationSkeleton />
-              </>
-            ) : notificationsQuery.isError ? (
-              <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
-                <CircleAlert className="size-7 text-destructive" />
-                <div>
-                  <p className="text-sm font-medium">
-                    Unable to load notifications
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Check your connection and try again.
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => void notificationsQuery.refetch()}
-                >
-                  <RefreshCw />
-                  Try again
-                </Button>
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
-                <span className="flex size-11 items-center justify-center rounded-full bg-muted">
-                  <Bell className="size-5 text-muted-foreground" />
-                </span>
-                <div>
-                  <p className="text-sm font-medium">No notifications yet</p>
-                  <p className="text-xs text-muted-foreground">
-                    New activity will appear here.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              notifications.map((notification) => (
-                <NotificationRow
-                  key={notification.id}
-                  notification={notification}
-                  onRead={(uuid) => markRead.mutate(uuid)}
-                />
-              ))
-            )}
-          </div>
+          <Tabs
+            value={filter}
+            onValueChange={(value) =>
+              setFilter(value as NotificationReadFilter)
+            }
+          >
+            <TabsList className="mx-3 mt-3 grid w-auto grid-cols-3">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="read">Read</TabsTrigger>
+              <TabsTrigger value="unread">Unread</TabsTrigger>
+            </TabsList>
+
+            {(["all", "read", "unread"] as const).map((tab) => (
+              <TabsContent key={tab} value={tab}>
+                {filter === tab ? (
+                  <div className="max-h-[min(25rem,62vh)] overflow-y-auto">
+                    {notificationsQuery.isLoading ? (
+                      <>
+                        <NotificationSkeleton />
+                        <NotificationSkeleton />
+                        <NotificationSkeleton />
+                      </>
+                    ) : notificationsQuery.isError ? (
+                      <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
+                        <CircleAlert className="size-7 text-destructive" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            Unable to load notifications
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Check your connection and try again.
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void notificationsQuery.refetch()}
+                        >
+                          <RefreshCw />
+                          Try again
+                        </Button>
+                      </div>
+                    ) : notifications.length === 0 ? (
+                      <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
+                        <span className="flex size-11 items-center justify-center rounded-full bg-muted">
+                          <Bell className="size-5 text-muted-foreground" />
+                        </span>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {emptyState.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {emptyState.description}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      notifications.map((notification) => (
+                        <NotificationRow
+                          key={notification.id}
+                          notification={notification}
+                          onRead={(uuid) => markRead.mutate(uuid)}
+                        />
+                      ))
+                    )}
+                  </div>
+                ) : null}
+              </TabsContent>
+            ))}
+          </Tabs>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

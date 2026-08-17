@@ -15,6 +15,14 @@ export type Notification = {
   time_ago: string;
 };
 
+export type NotificationReadFilter = "all" | "read" | "unread";
+
+export type NotificationListParams = {
+  per_page?: number;
+  read_status?: Exclude<NotificationReadFilter, "all">;
+  unread_only?: boolean;
+};
+
 export type NotificationListMeta = {
   current_page: number;
   last_page: number;

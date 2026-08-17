@@ -7,6 +7,7 @@ import { configureEchoClient } from "@/lib/echo/client";
 import { notificationKeys } from "../queries/notification-query";
 import type {
   Notification,
+  NotificationReadFilter,
   NotificationListResponse,
   UnreadCountResponse,
 } from "../types";
@@ -22,28 +23,39 @@ function NotificationRealtimeListener({ userId }: { userId: number }) {
     `users.${userId}`,
     ".notification.created",
     (notification) => {
-      let isNew = true;
-
-      queryClient.setQueryData<NotificationListResponse>(
-        notificationKeys.list(),
-        (current) => {
-          if (!current) return current;
-
-          if (current.data.some((item) => item.id === notification.id)) {
-            isNew = false;
-            return current;
-          }
-
-          return {
-            ...current,
-            data: [notification, ...current.data].slice(
-              0,
-              current.meta.per_page,
-            ),
-            meta: { ...current.meta, total: current.meta.total + 1 },
-          };
-        },
+      const cachedLists =
+        queryClient.getQueriesData<NotificationListResponse>({
+          queryKey: notificationKeys.lists(),
+        });
+      const isNew = !cachedLists.some(([, current]) =>
+        current?.data.some((item) => item.id === notification.id),
       );
+
+      cachedLists.forEach(([queryKey, current]) => {
+        if (!current) return;
+
+        const filter = queryKey[2] as NotificationReadFilter;
+        const matchesFilter =
+          filter === "all" ||
+          (filter === "read" && notification.is_read) ||
+          (filter === "unread" && !notification.is_read);
+
+        if (
+          !matchesFilter ||
+          current.data.some((item) => item.id === notification.id)
+        ) {
+          return;
+        }
+
+        queryClient.setQueryData<NotificationListResponse>(queryKey, {
+          ...current,
+          data: [notification, ...current.data].slice(
+            0,
+            current.meta.per_page,
+          ),
+          meta: { ...current.meta, total: current.meta.total + 1 },
+        });
+      });
 
       if (isNew && !notification.is_read) {
         queryClient.setQueryData<UnreadCountResponse>(
